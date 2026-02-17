@@ -1,0 +1,446 @@
+.dashboard-page {
+    padding-bottom: 5rem;
+}
+
+.welcome-text {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+/* Toshl Overview Section */
+.toshl-overview {
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(15, 23, 42, 0.4));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.toshl-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.toshl-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.toshl-left-to-spend {
+    text-align: right;
+}
+
+.toshl-left-to-spend.over .left-amount,
+.toshl-left-to-spend.over .left-text {
+    color: #ef4444;
+}
+
+.left-amount {
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #10b981;
+}
+
+.left-text {
+    font-size: 0.875rem;
+    color: #10b981;
+    font-weight: 600;
+}
+
+.toshl-progress-container {
+    margin-bottom: 2rem;
+}
+
+.toshl-progress-bar {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.toshl-progress-fill {
+    height: 100%;
+    background: #10b981;
+    border-radius: 6px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toshl-progress-fill.danger {
+    background: #ef4444;
+}
+
+.toshl-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.toshl-stat-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.stat-value.expense {
+    color: #ef4444;
+}
+
+/* Currency Comparison Grid */
+.currency-comparison-grid {
+    margin-top: -1rem;
+}
+
+.currency-card {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.currency-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.05);
+}
+
+.currency-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.currency-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.currency-rate {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.live-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.live-dot {
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #10b981;
+    animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Hero Section */
+.hero-section {
+    padding: 3rem;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--bg-card), rgba(255, 255, 255, 0.02));
+    position: relative;
+    max-height: 400px;
+}
+
+.hero-content {
+    flex: 1;
+    max-width: 550px;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(to right, #fff, var(--text-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 1rem;
+}
+
+.hero-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.hero-btn.primary {
+    background: var(--primary);
+    color: var(--bg-main);
+}
+
+.hero-btn.secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    border: 1px solid var(--border);
+}
+
+.hero-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.hero-visual {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.mini-dashboard {
+    width: 240px;
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    z-index: 2;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.mini-header {
+    margin-bottom: 1.5rem;
+}
+
+.mini-month {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.mini-total {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.mini-chart {
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.mini-bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    min-height: 10%;
+    transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mini-footer {
+    display: flex;
+    flex-direction: column;
+}
+
+.mini-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.mini-value {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.hero-circle-gradient {
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+    z-index: 1;
+    filter: blur(20px);
+}
+
+.add-transaction-btn {
+    background: var(--primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-glow);
+}
+
+.add-transaction-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+.chart-container {
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+}
+
+.chart-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(2, 6, 23, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 500px;
+    animation: modal-slide-in 0.3s ease-out;
+}
+
+@keyframes modal-slide-in {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.floating-add-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), var(--shadow-glow);
+    z-index: 100;
+}
+
+.floating-add-btn:hover {
+    background: var(--primary-hover);
+    transform: scale(1.1);
+}
+
+.chart-center-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+@media (max-width: 1024px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .welcome-text {
+        font-size: 1.5rem;
+    }
+
+    .add-transaction-btn span {
+        display: none;
+    }
+
+    .add-transaction-btn {
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .floating-add-btn {
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 52px;
+        height: 52px;
+    }
+}

@@ -1,0 +1,168 @@
+.navbar {
+    height: 80px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.logo-icon {
+    background: linear-gradient(135deg, var(--primary), var(--balance));
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-glow);
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(to right, var(--text-primary), var(--text-muted));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+}
+
+.nav-link:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+    color: var(--primary);
+    background: var(--primary-glow);
+}
+
+.theme-toggle-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.theme-toggle-btn:hover {
+    color: var(--primary);
+    border-color: var(--border-focus);
+}
+
+.profile-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.profile-role {
+    font-size: 0.75rem;
+}
+
+.profile-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.profile-btn:hover {
+    border-color: var(--border-focus);
+    color: var(--primary);
+}
+
+.logout-btn {
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.logout-btn:hover {
+    color: var(--expense);
+}
+
+@media (max-width: 768px) {
+
+    .profile-info,
+    .profile-name,
+    .profile-role {
+        display: none;
+    }
+
+    .nav-link span {
+        display: none;
+    }
+
+    .nav-profile {
+        gap: 0.5rem;
+    }
+}
+
+/* Integrated Market Ticker */
+.navbar-market-ticker {
+    flex: 1;
+    margin: 0 2rem;
+    position: relative;
+    max-width: 400px;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    overflow: hidden;
+}
+
+.ticker-content {
+    display: flex;
+    gap: 3rem;
+    animation: ticker-slide 20s linear infinite;
+    white-space: nowrap;
+}
+
+.ticker-val {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+}
+
+.ticker-pair {
+    font-weight: 500;
+}
+
+.ticker-personal {
+    background: rgba(16, 185, 129, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+    .navbar-market-ticker {
+        display: none !important;
+    }
+}
+
+@keyframes ticker-slide {
+    0% {
+        transform: translateX(50%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
