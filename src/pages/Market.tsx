@@ -1,144 +1,180 @@
-import React, { useState } from 'react';
-import { Globe, ArrowRightLeft, TrendingUp, RefreshCw } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { useTransactions } from '../context/TransactionContext';
+import {
+    PieChart as PieIcon,
+    Activity
+} from 'lucide-react';
+import {
+    PieChart,
+    Pie,
+    Cell,
+    Tooltip,
+    ResponsiveContainer,
+    BarChart as RechartsBarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Legend
+} from 'recharts';
+import TransactionList from '../components/transactions/TransactionList';
 import './Market.css';
 
-interface ExchangeRate {
-    code: string;
-    name: string;
-    rate: number;
-    symbol: string;
-    flag: string;
-}
-
 const Market: React.FC = () => {
-    const [baseCurrency, setBaseCurrency] = useState('USD');
-    const [loading, setLoading] = useState(false);
+    const {
+        transactions,
+        currencySymbol: symbol,
+        setIsFormOpen,
+        setEditingTransaction
+    } = useTransactions();
 
-    // Default static rates relative to 1 USD (Base)
-    const rawRates: Record<string, number> = {
-        USD: 1,
-        INR: 83.12,
-        EUR: 0.92,
-        GBP: 0.79,
-        JPY: 150.14,
-        CAD: 1.35,
-        AUD: 1.53,
+    const [activeTab, setActiveTab] = useState<'spending' | 'income'>('spending');
+
+    const parseDate = (date: any): Date => {
+        if (!date) return new Date();
+        if (typeof date.toDate === 'function') return date.toDate();
+        if (date.seconds !== undefined) return new Date(date.seconds * 1000);
+        const parsed = new Date(date);
+        return isNaN(parsed.getTime()) ? new Date() : parsed;
     };
 
-    const currencies: ExchangeRate[] = [
-        { code: 'USD', name: 'US Dollar', rate: 1, symbol: '$', flag: '🇺🇸' },
-        { code: 'INR', name: 'Indian Rupee', rate: 83.12, symbol: '₹', flag: '🇮🇳' },
-        { code: 'EUR', name: 'Euro', rate: 0.92, symbol: '€', flag: '🇪🇺' },
-        { code: 'GBP', name: 'British Pound', rate: 0.79, symbol: '£', flag: '🇬🇧' },
-        { code: 'JPY', name: 'Japanese Yen', rate: 150.14, symbol: '¥', flag: '🇯🇵' },
-        { code: 'CAD', name: 'Canadian Dollar', rate: 1.35, symbol: 'CA$', flag: '🇨🇦' },
-        { code: 'AUD', name: 'Australian Dollar', rate: 1.53, symbol: 'A$', flag: '🇦🇺' },
-    ];
-
-    const handleRefresh = () => {
-        setLoading(true);
-        setTimeout(() => setLoading(false), 800);
+    const handleEdit = (tx: any) => {
+        setEditingTransaction(tx);
+        setIsFormOpen(true);
     };
 
-    // Calculate rates relative to the selected base currency
-    const baseRateInUSD = rawRates[baseCurrency];
+    // Category Distribution Data
+    const categoryData = useMemo(() => {
+        const type = activeTab === 'spending' ? 'expense' : 'income';
+        const map = transactions
+            .filter(t => t.type === type)
+            .reduce((acc, t) => {
+                const amount = Number(t.amount) || 0;
+                acc[t.category] = (acc[t.category] || 0) + amount;
+                return acc;
+            }, {} as Record<string, number>);
+
+        return Object.entries(map)
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value);
+    }, [transactions, activeTab]);
+
+    // Monthly Trend Data
+    const monthlyTrend = useMemo(() => {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const currentYear = new Date().getFullYear();
+
+        const data = months.map(m => ({ name: m, income: 0, expense: 0 }));
+
+        transactions.forEach(t => {
+            const date = parseDate(t.date);
+            if (date.getFullYear() === currentYear) {
+                const monthIdx = date.getMonth();
+                if (t.type === 'income') data[monthIdx].income += t.amount;
+                else data[monthIdx].expense += t.amount;
+            }
+        });
+
+        return data;
+    }, [transactions]);
+
+    const COLORS = ['#7c3af2', '#2cd1c1', '#f59e0b', '#10b981', '#ef4444', '#0ea5e9'];
 
     return (
-        <div className="market-page container">
-            <div className="market-header glass mb-8">
-                <div className="header-info">
-                    <div className="title-wrapper gap-3">
-                        <div className="icon-box primary">
-                            <Globe size={24} />
-                        </div>
-                        <div>
-                            <h1 className="market-title">Global Currency Market</h1>
-                            <p className="market-subtitle">Real-time exchange rates against your chosen base currency</p>
-                        </div>
-                    </div>
+        <div className="market-page">
+            <header className="market-header-refined">
+                <div>
+                    <h1 className="market-title">Spending Analytics</h1>
+                    <p className="market-subtitle">Deep dive into your financial patterns</p>
                 </div>
-                <div className="header-actions">
-                    <button
-                        className={`refresh-btn glass ${loading ? 'loading' : ''}`}
-                        onClick={handleRefresh}
-                    >
-                        <RefreshCw size={18} />
-                        <span>Refresh Rates</span>
-                    </button>
-                </div>
-            </div>
-
-            <div className="market-controls glass mb-8">
-                <div className="control-item">
-                    <label>Base Currency</label>
-                    <div className="base-switcher">
-                        {['USD', 'INR', 'EUR', 'GBP'].map(curr => (
-                            <button
-                                key={curr}
-                                className={`base-btn ${baseCurrency === curr ? 'active' : ''}`}
-                                onClick={() => setBaseCurrency(curr)}
-                            >
-                                {curr}
-                            </button>
-                        ))}
-                        <select
-                            className="base-select"
-                            value={baseCurrency}
-                            onChange={(e) => setBaseCurrency(e.target.value)}
+                <div className="analytics-actions">
+                    <div className="analytics-toggle glass">
+                        <button
+                            className={`toggle-btn ${activeTab === 'spending' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('spending')}
                         >
-                            {currencies.map(c => (
-                                <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
-                            ))}
-                        </select>
+                            Expenses
+                        </button>
+                        <button
+                            className={`toggle-btn ${activeTab === 'income' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('income')}
+                        >
+                            Income
+                        </button>
                     </div>
                 </div>
-                <div className="market-insight">
-                    <ArrowRightLeft className="text-primary" size={20} />
-                    <span>Showing market value for <strong>1 {baseCurrency}</strong></span>
-                </div>
-            </div>
+            </header>
 
-            <div className="market-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {currencies.map((currency) => {
-                    if (currency.code === baseCurrency) return null;
-
-                    // Conversion: (1 / baseRateInUSD) * currencyRateInUSD
-                    const convertedRate = (1 / baseRateInUSD) * currency.rate;
-
-                    return (
-                        <div key={currency.code} className="rate-card glass animate-fade-in">
-                            <div className="card-top">
-                                <span className="currency-flag">{currency.flag}</span>
-                                <div className="currency-meta">
-                                    <h3 className="currency-code">{currency.code}</h3>
-                                    <span className="currency-name">{currency.name}</span>
-                                </div>
-                                <div className="trend-indicator up">
-                                    <TrendingUp size={14} />
-                                    <span>+0.02%</span>
-                                </div>
-                            </div>
-                            <div className="card-main">
-                                <span className="rate-label">1 {baseCurrency} =</span>
-                                <div className="rate-display">
-                                    <span className="rate-symbol">{currency.symbol}</span>
-                                    <h2 className="rate-value">
-                                        {convertedRate.toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 4
-                                        })}
-                                    </h2>
-                                </div>
-                            </div>
-                            <div className="card-footer">
-                                <div className="mini-graph">
-                                    <div className="graph-line"></div>
-                                </div>
-                                <span className="update-time">Last updated: Just now</span>
-                            </div>
+            <div className="analytics-layout">
+                {/* Main Distribution Chart */}
+                <div className="premium-card chart-main-card">
+                    <div className="card-header">
+                        <h3 className="card-title">Monthly Cashflow Trend</h3>
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-muted uppercase tracking-widest">
+                            <Activity size={12} className="text-secondary" /> Annual Performance
                         </div>
-                    );
-                })}
+                    </div>
+                    <div className="chart-wrapper" style={{ height: '350px', marginTop: '1.5rem', minWidth: 0 }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RechartsBarChart data={monthlyTrend}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                                <Tooltip
+                                    contentStyle={{ background: '#0f1014', border: '1px solid var(--border)', borderRadius: '16px' }}
+                                    cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                                />
+                                <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} />
+                                <Bar dataKey="income" name="Income" fill="#2cd1c1" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="expense" name="Expense" fill="#7c3af2" radius={[4, 4, 0, 0]} />
+                            </RechartsBarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Category Breakdown Sidebar */}
+                <div className="premium-card chart-side-card">
+                    <div className="card-header">
+                        <h3 className="card-title">Category Share</h3>
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-muted uppercase tracking-widest">
+                            <PieIcon size={12} className="text-primary" /> Breakdown
+                        </div>
+                    </div>
+                    <div className="chart-wrapper" style={{ height: '280px', marginTop: '1rem', minWidth: 0 }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={categoryData}
+                                    innerRadius={70}
+                                    outerRadius={90}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                >
+                                    {categoryData.map((_entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip contentStyle={{ background: '#0f1014', border: '1px solid var(--border)', borderRadius: '12px' }} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                    <div className="mt-6 flex flex-col gap-4">
+                        {categoryData.slice(0, 5).map((item, index) => (
+                            <div key={index} className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                                    <span className="text-xs font-bold text-muted truncate max-w-[120px]">{item.name}</span>
+                                </div>
+                                <span className="text-sm font-black">{symbol}{item.value.toLocaleString()}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Transaction History Full List */}
+                <div className="history-full-area">
+                    <TransactionList onEdit={handleEdit} />
+                </div>
             </div>
         </div>
     );

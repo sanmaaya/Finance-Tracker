@@ -1,0 +1,241 @@
+{
+    "transactions": [
+        {
+            "title": "Feb Salary",
+            "amount": 95000,
+            "category": "Salary",
+            "type": "income",
+            "date": "2026-02-01T09:00:00Z"
+        },
+        {
+            "title": "Freelance Project",
+            "amount": 18500,
+            "category": "Investment",
+            "type": "income",
+            "date": "2026-02-10T14:30:00Z"
+        },
+        {
+            "title": "Luxury Apartment Rent",
+            "amount": 32000,
+            "category": "Housing",
+            "type": "expense",
+            "date": "2026-02-02T10:00:00Z"
+        },
+        {
+            "title": "Valentine's Dinner",
+            "amount": 6500,
+            "category": "Food & Drinks",
+            "type": "expense",
+            "date": "2026-02-14T20:00:00Z"
+        },
+        {
+            "title": "Apple Store Purchase",
+            "amount": 12500,
+            "category": "Shopping",
+            "type": "expense",
+            "date": "2026-02-10T16:00:00Z"
+        },
+        {
+            "title": "Electric Bill",
+            "amount": 4200,
+            "category": "Housing",
+            "type": "expense",
+            "date": "2026-02-05T12:00:00Z"
+        },
+        {
+            "title": "Gym Membership",
+            "amount": 3500,
+            "category": "Others",
+            "type": "expense",
+            "date": "2026-02-05T10:00:00Z"
+        },
+        {
+            "title": "Jan Salary",
+            "amount": 95000,
+            "category": "Salary",
+            "type": "income",
+            "date": "2026-01-01T09:00:00Z"
+        },
+        {
+            "title": "Jan Rent",
+            "amount": 32000,
+            "category": "Housing",
+            "type": "expense",
+            "date": "2026-01-02T10:00:00Z"
+        },
+        {
+            "title": "New Year Shopping",
+            "amount": 18000,
+            "category": "Shopping",
+            "type": "expense",
+            "date": "2026-01-05T12:00:00Z"
+        },
+        {
+            "title": "Insurance Premium",
+            "amount": 8500,
+            "category": "Others",
+            "type": "expense",
+            "date": "2026-01-15T09:00:00Z"
+        },
+        {
+            "title": "Dec Salary",
+            "amount": 95000,
+            "category": "Salary",
+            "type": "income",
+            "date": "2025-12-01T09:00:00Z"
+        },
+        {
+            "title": "Stock Dividend",
+            "amount": 25000,
+            "category": "Investment",
+            "type": "income",
+            "date": "2025-12-15T10:00:00Z"
+        },
+        {
+            "title": "Dec Rent",
+            "amount": 32000,
+            "category": "Housing",
+            "type": "expense",
+            "date": "2025-12-02T10:00:00Z"
+        },
+        {
+            "title": "Christmas Gifts",
+            "amount": 22000,
+            "category": "Shopping",
+            "type": "expense",
+            "date": "2025-12-20T10:00:00Z"
+        },
+        {
+            "title": "Year-end Party",
+            "amount": 12500,
+            "category": "Entertainment",
+            "type": "expense",
+            "date": "2025-12-31T20:00:00Z"
+        },
+        {
+            "title": "Nov Salary",
+            "amount": 95000,
+            "category": "Salary",
+            "type": "income",
+            "date": "2025-11-01T09:00:00Z"
+        },
+        {
+            "title": "Nov Rent",
+            "amount": 32000,
+            "category": "Housing",
+            "type": "expense",
+            "date": "2025-11-02T10:00:00Z"
+        },
+        {
+            "title": "Tech Upgrade",
+            "amount": 45000,
+            "category": "Shopping",
+            "type": "expense",
+            "date": "2025-11-15T14:00:00Z"
+        },
+        {
+            "title": "Groceries",
+            "amount": 8500,
+            "category": "Food & Drinks",
+            "type": "expense",
+            "date": "2025-11-20T10:00:00Z"
+        },
+        {
+            "title": "Oct Salary",
+            "amount": 92000,
+            "category": "Salary",
+            "type": "income",
+            "date": "2025-10-01T09:00:00Z"
+        },
+        {
+            "title": "Oct Rent",
+            "amount": 30000,
+            "category": "Housing",
+            "type": "expense",
+            "date": "2025-10-02T10:00:00Z"
+        },
+        {
+            "title": "Car Service",
+            "amount": 12000,
+            "category": "Others",
+            "type": "expense",
+            "date": "2025-10-10T09:00:00Z"
+        },
+        {
+            "title": "Sep Salary",
+            "amount": 92000,
+            "category": "Salary",
+            "type": "income",
+            "date": "2025-09-01T09:00:00Z"
+        },
+        {
+            "title": "Sep Rent",
+            "amount": 30000,
+            "category": "Housing",
+            "type": "expense",
+            "date": "2025-09-02T10:00:00Z"
+        },
+        {
+            "title": "Flight Tickets",
+            "amount": 28000,
+            "category": "Others",
+            "type": "expense",
+            "date": "2025-09-15T15:00:00Z"
+        },
+        {
+            "title": "Aug Salary",
+            "amount": 92000,
+            "category": "Salary",
+            "type": "income",
+            "date": "2025-08-01T09:00:00Z"
+        },
+        {
+            "title": "Aug Rent",
+            "amount": 30000,
+            "category": "Housing",
+            "type": "expense",
+            "date": "2025-08-02T10:00:00Z"
+        },
+        {
+            "title": "Summer Outing",
+            "amount": 15000,
+            "category": "Entertainment",
+            "type": "expense",
+            "date": "2025-08-20T10:00:00Z"
+        }
+    ],
+    "installments": [
+        {
+            "name": "MacBook Pro M3 Max",
+            "totalAmount": 350000,
+            "monthlyEmi": 29000,
+            "tenure": 12,
+            "paidMonths": 5,
+            "category": "Electronics",
+            "type": "debt",
+            "startDate": "2025-10-01"
+        },
+        {
+            "name": "Tesla Model S Fund",
+            "totalAmount": 8500000,
+            "monthlyEmi": 150000,
+            "tenure": 48,
+            "paidMonths": 8,
+            "category": "Transport",
+            "type": "goal",
+            "startDate": "2025-07-20"
+        },
+        {
+            "name": "Switzerland Dream Trip",
+            "totalAmount": 500000,
+            "monthlyEmi": 25000,
+            "tenure": 24,
+            "paidMonths": 14,
+            "category": "Travel",
+            "type": "goal",
+            "startDate": "2025-01-15"
+        }
+    ],
+    "exportedAt": "2026-02-18T23:35:00Z",
+    "version": "2.0"
+}

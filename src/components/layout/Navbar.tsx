@@ -1,59 +1,101 @@
+import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Wallet, LayoutDashboard, User, LogOut, PlusCircle, Sun, Moon, Globe } from 'lucide-react';
+import {
+  LayoutDashboard,
+  TrendingUp,
+  LogOut,
+  Sun,
+  Moon,
+  Zap,
+  Settings,
+  User
+} from 'lucide-react';
 import './Navbar.css';
-import { useTheme } from '../../context/ThemeContext';
-
 import { useAuth } from '../../context/AuthContext';
-import { useTransactions } from '../../context/TransactionContext';
+import { useTheme } from '../../context/ThemeContext';
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { setIsFormOpen, setEditingTransaction } = useTransactions();
-
 
   return (
-    <nav className="navbar glass">
-      <div className="container flex items-center justify-between">
-        <div className="nav-logo flex items-center gap-2">
-          <div className="logo-icon">
-            <Wallet size={24} color="white" />
+    <>
+      {/* Mobile Top Header */}
+      <div className="mobile-header">
+        <div className="nav-brand">
+          <div className="brand-logo-container">
+            <img src="/logo.png" alt="Logo" className="brand-logo" />
           </div>
-          <span className="logo-text">FinTrack</span>
+          <span className="brand-name-main">Paisa</span>
         </div>
-
-        <div className="nav-links flex items-center gap-6">
-          <NavLink to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-            <LayoutDashboard size={18} />
-            <span>Dashboard</span>
-          </NavLink>
-          <button className="nav-link" onClick={() => { setEditingTransaction(null); setIsFormOpen(true); }}>
-            <PlusCircle size={18} />
-            <span>Add Transaction</span>
+        <div className="mobile-actions">
+          <button className="theme-toggle-btn" onClick={toggleTheme}>
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
-          <NavLink to="/market" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-            <Globe size={18} />
-            <span>Market</span>
+          <NavLink to="/settings" className="profile-avatar">
+            {user?.photoURL ? <img src={user.photoURL} alt="User" /> : <User size={18} />}
           </NavLink>
-        </div>
-
-        <div className="nav-profile flex items-center gap-4">
-          <button className="theme-toggle-btn glass" onClick={toggleTheme} title="Toggle Theme">
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <div className="profile-info text-right">
-            <p className="profile-name">{user?.email?.split('@')[0] || 'User'}</p>
-            <p className="profile-role text-secondary">Premium User</p>
-          </div>
-          <NavLink to="/settings" className={({ isActive }) => isActive ? 'profile-btn glass active' : 'profile-btn glass'}>
-            <User size={20} />
-          </NavLink>
-          <button className="logout-btn" title="Logout" onClick={() => logout()}>
-            <LogOut size={20} />
-          </button>
         </div>
       </div>
-    </nav>
+
+      <nav className="navbar premium-navbar">
+        <div className="container flex items-center justify-between">
+          <NavLink to="/" className="nav-brand flex items-center gap-3">
+            <div className="brand-logo-container">
+              <img src="/logo.png" alt="Logo" className="brand-logo" />
+            </div>
+            <div className="brand-text-container">
+              <span className="brand-name-main">Paisa</span>
+              <span className="brand-name-sub">Bachao</span>
+            </div>
+          </NavLink>
+
+          <div className="nav-tabs">
+            <NavLink to="/" className={({ isActive }) => isActive ? 'nav-tab active' : 'nav-tab'}>
+              <LayoutDashboard size={18} />
+              <span>Overview</span>
+            </NavLink>
+            <NavLink to="/installments" className={({ isActive }) => isActive ? 'nav-tab active' : 'nav-tab'}>
+              <Zap size={18} />
+              <span>Installments</span>
+            </NavLink>
+            <NavLink to="/market" className={({ isActive }) => isActive ? 'nav-tab active' : 'nav-tab'}>
+              <TrendingUp size={18} />
+              <span>Analytics</span>
+            </NavLink>
+            {/* Added Settings to mobile tabs for better reachability */}
+            <NavLink to="/settings" className={({ isActive }) => isActive ? 'nav-tab active' : 'nav-tab mobile-only'}>
+              <Settings size={18} />
+              <span className="md:inline">Settings</span>
+            </NavLink>
+          </div>
+
+          <div className="nav-right">
+            <button className="theme-toggle-btn" onClick={toggleTheme} title="Toggle Theme">
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+
+            <div className="nav-profile">
+              <NavLink to="/settings" className="flex items-center gap-3">
+                <div className="profile-avatar">
+                  {user?.photoURL ? <img src={user.photoURL} alt="P" /> : <User size={18} />}
+                </div>
+                <div className="profile-info">
+                  <p className="profile-name">{user?.displayName || 'User'}</p>
+                </div>
+              </NavLink>
+              <button
+                className="logout-btn p-2 hover:text-rose-500 transition-colors"
+                onClick={() => logout()}
+                title="Logout"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </>
   );
 };
 

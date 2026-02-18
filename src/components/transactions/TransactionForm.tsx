@@ -106,8 +106,9 @@ const TransactionForm: React.FC<FormProps> = ({ onClose, editData }) => {
                 </div>
 
                 <div className="input-group">
-                    <label className="input-label"><FileText size={16} /> Title</label>
-                    <div className="input-wrapper glass">
+                    <label className="input-label">Title</label>
+                    <div className="input-wrapper">
+                        <FileText size={18} className="input-icon" />
                         <input
                             type="text"
                             placeholder="e.g. Grocery Shopping"
@@ -120,8 +121,9 @@ const TransactionForm: React.FC<FormProps> = ({ onClose, editData }) => {
 
                 <div className="input-row flex gap-4">
                     <div className="input-group flex-1">
-                        <label className="input-label"><DollarSign size={16} /> Amount</label>
-                        <div className="input-wrapper glass">
+                        <label className="input-label">Amount</label>
+                        <div className="input-wrapper">
+                            <DollarSign size={18} className="input-icon" />
                             <input
                                 type="number"
                                 placeholder="0.00"
@@ -133,8 +135,9 @@ const TransactionForm: React.FC<FormProps> = ({ onClose, editData }) => {
                     </div>
 
                     <div className="input-group flex-1">
-                        <label className="input-label"><Calendar size={16} /> Date</label>
-                        <div className="input-wrapper glass">
+                        <label className="input-label">Date</label>
+                        <div className="input-wrapper">
+                            <Calendar size={18} className="input-icon" />
                             <input
                                 type="date"
                                 value={formData.date}
@@ -146,8 +149,9 @@ const TransactionForm: React.FC<FormProps> = ({ onClose, editData }) => {
                 </div>
 
                 <div className="input-group">
-                    <label className="input-label"><Tag size={16} /> Category</label>
-                    <div className="input-wrapper glass">
+                    <label className="input-label">Category</label>
+                    <div className="input-wrapper">
+                        <Tag size={18} className="input-icon" />
                         <select
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}

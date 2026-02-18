@@ -1,264 +1,119 @@
+/* Spending Analytics Page Styles */
 .market-page {
-    padding-top: 2rem;
-    padding-bottom: 5rem;
+    padding: 1.25rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-.market-header {
-    padding: 2.5rem;
+@media (min-width: 769px) {
+    .market-page {
+        padding: 2rem;
+    }
+}
+
+.market-header-refined {
+    margin-bottom: 2.5rem;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    border-color: rgba(var(--primary-rgb), 0.2);
-    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), rgba(15, 23, 42, 0.4));
+    align-items: flex-end;
 }
 
-.title-wrapper {
-    display: flex;
-    align-items: center;
+@media (max-width: 640px) {
+    .market-header-refined {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
 }
 
 .market-title {
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
     margin: 0;
-    letter-spacing: -1px;
 }
 
 .market-subtitle {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
+    font-weight: 500;
     margin-top: 0.25rem;
 }
 
-.refresh-btn {
+.analytics-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas:
+        "main main side"
+        "history history history";
+    gap: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+    .analytics-layout {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "main"
+            "side"
+            "history";
+    }
+}
+
+.chart-main-card {
+    grid-area: main;
+}
+
+.chart-side-card {
+    grid-area: side;
+}
+
+.history-full-area {
+    grid-area: history;
+    margin-top: 1rem;
+}
+
+/* Toggle Buttons */
+.analytics-toggle {
+    padding: 0.25rem;
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1.25rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
+    border-radius: 14px;
+    background: var(--bg-card);
 }
 
-.refresh-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-2px);
-}
-
-.refresh-btn.loading svg {
-    animation: spin 1s linear infinite;
-}
-
-/* Controls */
-.market-controls {
-    padding: 1.5rem 2.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.control-item label {
+.toggle-btn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 10px;
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--text-muted);
-    letter-spacing: 1px;
-    display: block;
-    margin-bottom: 0.75rem;
+    transition: all 0.3s;
 }
 
-.base-switcher {
-    display: flex;
-    gap: 0.5rem;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 4px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-}
-
-.base-btn {
-    padding: 0.5rem 1.25rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
-}
-
-.base-btn:hover {
-    color: white;
-}
-
-.base-btn.active {
+.toggle-btn.active {
     background: var(--primary);
     color: white;
-    box-shadow: var(--shadow-glow);
+    box-shadow: 0 4px 12px var(--primary-glow);
 }
 
-.base-select {
-    background: transparent;
-    border: none;
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    padding: 0 1rem;
-    cursor: pointer;
-    border-left: 1px solid var(--border);
-}
-
-.market-insight {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    background: rgba(var(--primary-rgb), 0.05);
-    padding: 0.75rem 1.5rem;
-    border-radius: 50px;
-    border: 1px solid rgba(var(--primary-rgb), 0.1);
-}
-
-/* Grid & Cards */
-.rate-card {
-    padding: 1.75rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.rate-card:hover {
-    transform: translateY(-8px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), var(--shadow-glow);
-}
-
-.card-top {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.currency-flag {
-    font-size: 2rem;
-}
-
-.currency-meta {
-    flex: 1;
-}
-
-.currency-code {
-    font-size: 1.25rem;
-    font-weight: 800;
-    margin: 0;
-}
-
-.currency-name {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.trend-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.6rem;
-    border-radius: 50px;
-    font-size: 0.7rem;
-    font-weight: 700;
-}
-
-.trend-indicator.up {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-}
-
-.card-main {
-    margin-bottom: 2rem;
-}
-
-.rate-label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.rate-display {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-}
-
-.rate-symbol {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--primary);
-}
-
-.rate-value {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin: 0;
-    letter-spacing: -1px;
-}
-
-.card-footer {
-    border-top: 1px solid var(--border);
-    padding-top: 1.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.update-time {
-    font-size: 0.65rem;
-    color: var(--text-muted);
-}
-
-.mini-graph {
-    width: 60px;
-    height: 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 4px;
-    position: relative;
-    overflow: hidden;
-}
-
-.graph-line {
-    position: absolute;
-    bottom: 5px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--primary);
-    box-shadow: 0 0 8px var(--primary);
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
+@media (max-width: 640px) {
+    .analytics-actions {
+        width: 100%;
     }
 
-    to {
-        transform: rotate(360deg);
+    .analytics-toggle {
+        width: 100%;
     }
-}
 
-@media (max-width: 768px) {
-    .market-header {
-        flex-direction: column;
-        gap: 1.5rem;
+    .toggle-btn {
+        flex: 1;
         text-align: center;
-        padding: 1.5rem;
     }
+}
 
-    .market-controls {
-        flex-direction: column;
-        gap: 1.5rem;
-        padding: 1.5rem;
-    }
-
-    .base-switcher {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+/* Custom Chart Tooltips */
+.recharts-tooltip-wrapper {
+    outline: none !important;
 }

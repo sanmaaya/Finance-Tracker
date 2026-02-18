@@ -1,5 +1,7 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { useTransactions } from '../../context/TransactionContext';
+
 import './SummaryCards.css';
 
 interface SummaryProps {
@@ -9,14 +11,12 @@ interface SummaryProps {
 }
 
 const SummaryCards: React.FC<SummaryProps> = ({ totalBalance, totalIncome, totalExpense }) => {
+    const { currencySymbol } = useTransactions();
+
     const formatCurrency = (amount: number) => {
-        const currency = localStorage.getItem('pref_currency') || 'INR';
-        const locale = currency === 'INR' ? 'en-IN' : 'en-US';
-        return new Intl.NumberFormat(locale, {
-            style: 'currency',
-            currency: currency,
-        }).format(amount);
+        return `${currencySymbol}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
+
 
     return (
         <div className="summary-cards-grid">
@@ -31,12 +31,12 @@ const SummaryCards: React.FC<SummaryProps> = ({ totalBalance, totalIncome, total
                     <h2 className="card-amount">{formatCurrency(totalBalance)}</h2>
                     <div className={`card-badge balance-badge`}>
                         {totalBalance >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                        <span>Stable</span>
+                        <span>{totalBalance >= 0 ? 'Liquid' : 'Overdrawn'}</span>
                     </div>
                 </div>
                 <div className="card-footer">
                     <div className="progress-bar-bg">
-                        <div className="progress-bar-fill" style={{ width: '65%' }}></div>
+                        <div className="progress-bar-fill" style={{ width: `${Math.min(Math.max((totalBalance / (totalIncome || 1)) * 100, 10), 100)}%` }}></div>
                     </div>
                 </div>
             </div>

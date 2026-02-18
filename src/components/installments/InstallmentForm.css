@@ -1,0 +1,248 @@
+.installment-form-container {
+    background: var(--bg-card);
+    border-radius: 32px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Changed from flex-start to center for better title alignment */
+    margin-bottom: 2.5rem;
+}
+
+.header-info {
+    flex: 1;
+}
+
+.premium-type-selector {
+    display: flex;
+    background: var(--bg-main);
+    padding: 0.4rem;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+}
+
+.premium-type-selector .type-btn {
+    flex: 1;
+    padding: 0.9rem;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: transparent;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.premium-type-selector .type-btn.active.debt {
+    background: var(--expense);
+    color: white;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.premium-type-selector .type-btn.active.goal {
+    background: var(--income);
+    color: white;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.close-btn {
+    background: var(--border);
+    border: 1px solid var(--border);
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+.close-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--expense);
+    border-color: rgba(239, 68, 68, 0.2);
+    transform: rotate(90deg);
+}
+
+.premium-form .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field.full {
+    grid-column: span 2;
+}
+
+.input-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    padding-left: 0.5rem;
+    /* Better alignment with icon */
+}
+
+.input-wrapper {
+    position: relative;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    /* Prevent text overlap */
+}
+
+.input-wrapper:focus-within {
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.05);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+.input-icon {
+    position: absolute;
+    left: 1.25rem;
+    color: var(--primary);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 1.1rem 1.25rem 1.1rem 3.5rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    outline: none;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* Custom styling for date input */
+.input-wrapper input[type="date"] {
+    position: relative;
+    padding-right: 0.5rem;
+}
+
+/* Ensure select arrow is properly placed if we used appearance: none */
+.input-wrapper select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%237c3af2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1.25rem center;
+    background-size: 1.25rem;
+}
+
+.input-wrapper select option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.25rem;
+    margin-top: 3.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+}
+
+.cancel-btn {
+    padding: 1rem 2.25rem;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    background: transparent;
+}
+
+.cancel-btn:hover {
+    color: var(--text-primary);
+    background: var(--border);
+}
+
+.submit-btn {
+    padding: 1rem 3rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 18px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    box-shadow: 0 8px 25px var(--primary-glow);
+}
+
+.submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px var(--primary-glow);
+    filter: brightness(1.1);
+}
+
+.submit-btn:disabled {
+    opacity: 0.5;
+    transform: none;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .installment-form-container {
+        padding: 1.75rem;
+        border-radius: 28px;
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+    }
+
+    .premium-form .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .input-field.full {
+        grid-column: span 1;
+    }
+
+    .form-footer {
+        flex-direction: column-reverse;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+    }
+
+    .cancel-btn,
+    .submit-btn {
+        width: 100%;
+        padding: 1.1rem;
+    }
+}

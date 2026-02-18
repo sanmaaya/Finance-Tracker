@@ -6,18 +6,32 @@ import { useTransactions } from '../context/TransactionContext';
 import './Settings.css';
 
 const Settings: React.FC = () => {
-    const { user } = useAuth();
+    const { user, updateUsername } = useAuth();
     const { theme, setTheme } = useTheme();
-    const { transactions, deleteTransaction } = useTransactions();
+    const {
+        transactions,
+        installments,
+        updateCurrency,
+        currency: globalCurrency,
+        seedDefaultData,
+        resetAllData,
+        importAllData
+    } = useTransactions();
 
     const [profile, setProfile] = useState({
-        firstName: localStorage.getItem('user_firstName') || '',
-        lastName: localStorage.getItem('user_lastName') || '',
+        username: user?.displayName || '',
         phone: localStorage.getItem('user_phone') || ''
     });
 
+    // Sync profile state when user loads
+    React.useEffect(() => {
+        if (user?.displayName) {
+            setProfile(prev => ({ ...prev, username: user.displayName || '' }));
+        }
+    }, [user]);
+
     const [preferences, setPreferences] = useState({
-        currency: localStorage.getItem('pref_currency') || 'INR',
+        currency: globalCurrency,
         monthlyBudget: localStorage.getItem('pref_monthlyBudget') || '50000'
     });
 
@@ -36,19 +50,27 @@ const Settings: React.FC = () => {
         { id: 'light', name: 'Stone', color: '#fafaf9' },
         { id: 'emerald', name: 'Emerald', color: '#064e3b' },
         { id: 'rose', name: 'Rose', color: '#4c0519' },
-        { id: 'ocean', name: 'Ocean', color: '#083344' }
+        { id: 'ocean', name: 'Ocean', color: '#083344' },
+        { id: 'premium-dark', name: 'Premium Dark', color: '#050507' }
     ];
 
-    const handleProfileSave = (e: React.FormEvent) => {
-        e.preventDefault();
-        localStorage.setItem('user_firstName', profile.firstName);
-        localStorage.setItem('user_lastName', profile.lastName);
-        localStorage.setItem('user_phone', profile.phone);
-        localStorage.setItem('pref_currency', preferences.currency);
-        localStorage.setItem('pref_monthlyBudget', preferences.monthlyBudget);
-        localStorage.setItem('pref_categories', JSON.stringify(categories));
-        alert('Profile and preferences updated successfully!');
-        window.location.reload(); // Refresh to apply currency changes everywhere
+    const handleProfileSave = async (e?: React.FormEvent | React.MouseEvent) => {
+        if (e) e.preventDefault();
+
+        try {
+            if (profile.username && profile.username !== user?.displayName) {
+                await updateUsername(profile.username);
+            }
+            updateCurrency(preferences.currency);
+            localStorage.setItem('user_phone', profile.phone);
+            localStorage.setItem('pref_monthlyBudget', preferences.monthlyBudget);
+            localStorage.setItem('pref_categories', JSON.stringify(categories));
+
+            alert('Profile & Preferences updated successfully! ✨');
+        } catch (error) {
+            console.error(error);
+            alert('Failed to update profile. Please try again.');
+        }
     };
 
     const addCategory = () => {
@@ -63,9 +85,15 @@ const Settings: React.FC = () => {
     };
 
     const exportData = () => {
-        const dataStr = JSON.stringify(transactions, null, 2);
+        const fullData = {
+            transactions,
+            installments,
+            exportedAt: new Date().toISOString(),
+            version: '2.0'
+        };
+        const dataStr = JSON.stringify(fullData, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-        const exportFileDefaultName = `fintrack_data_${new Date().toISOString().split('T')[0]}.json`;
+        const exportFileDefaultName = `paisa_backup_${new Date().toISOString().split('T')[0]}.json`;
 
         const linkElement = document.createElement('a');
         linkElement.setAttribute('href', dataUri);
@@ -74,12 +102,13 @@ const Settings: React.FC = () => {
     };
 
     const resetData = async () => {
-        if (window.confirm('Are you sure you want to delete ALL transactions? This cannot be undone.')) {
-            // In a better implementation, we'd have a batch delete in TransactionContext
-            for (const t of transactions) {
-                await deleteTransaction(t.id);
+        if (window.confirm('Are you sure you want to delete ALL transactions and plans? This cannot be undone.')) {
+            try {
+                await resetAllData();
+                alert('All data has been wiped clean. ✨');
+            } catch (error) {
+                alert('Failed to reset data. Please check your connection.');
             }
-            alert('All data has been reset.');
         }
     };
 
@@ -88,13 +117,21 @@ const Settings: React.FC = () => {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             try {
                 const imported = JSON.parse(event.target?.result as string);
-                console.log('Imported data:', imported);
-                alert('Import functionality requires backend batch support. Files are parsed, but individual adding is pending.');
+
+                if (!imported.transactions && !imported.installments) {
+                    throw new Error("Invalid file format");
+                }
+
+                if (window.confirm('This will add all data from the file to your current account. Continue?')) {
+                    await importAllData(imported);
+                    alert('Data imported successfully! 🚀');
+                }
             } catch (err) {
-                alert('Invalid JSON file.');
+                console.error(err);
+                alert('Failed to import data. Ensure the file is a valid Paisa backup.');
             }
         };
         reader.readAsText(file);
@@ -111,28 +148,17 @@ const Settings: React.FC = () => {
                         <User size={20} className="text-primary" /> Personal Information
                     </h2>
                     <form onSubmit={handleProfileSave} className="profile-form">
-                        <div className="flex gap-4">
-                            <div className="settings-input-group flex-1">
-                                <label>First Name</label>
-                                <input
-                                    type="text"
-                                    value={profile.firstName}
-                                    onChange={e => setProfile({ ...profile, firstName: e.target.value })}
-                                    placeholder="Sanmaya"
-                                />
-                            </div>
-                            <div className="settings-input-group flex-1">
-                                <label>Last Name</label>
-                                <input
-                                    type="text"
-                                    value={profile.lastName}
-                                    onChange={e => setProfile({ ...profile, lastName: e.target.value })}
-                                    placeholder="MB"
-                                />
-                            </div>
+                        <div className="settings-input-group">
+                            <label>Username</label>
+                            <input
+                                type="text"
+                                value={profile.username}
+                                onChange={e => setProfile({ ...profile, username: e.target.value })}
+                                placeholder="Paisa User"
+                            />
                         </div>
                         <div className="settings-input-group">
-                            <label>Email Address (Managed by Firebase)</label>
+                            <label>Email Address</label>
                             <input type="email" value={user?.email || ''} disabled />
                         </div>
                         <div className="settings-input-group">
@@ -193,6 +219,13 @@ const Settings: React.FC = () => {
                                 placeholder="e.g. 50000"
                             />
                         </div>
+                        <button
+                            type="button"
+                            className="save-profile-btn mt-6"
+                            onClick={handleProfileSave}
+                        >
+                            Update Preferences
+                        </button>
                     </div>
                 </div>
 
@@ -230,6 +263,13 @@ const Settings: React.FC = () => {
                             </div>
                         ))}
                     </div>
+                    <button
+                        type="button"
+                        className="save-profile-btn mt-6 w-full"
+                        onClick={handleProfileSave}
+                    >
+                        Save Categories
+                    </button>
                 </div>
 
                 {/* Data Management Section */}
@@ -248,6 +288,11 @@ const Settings: React.FC = () => {
                             <span>Import Data</span>
                             <input type="file" accept=".json" hidden onChange={handleImport} />
                         </label>
+
+                        <button className="data-btn" onClick={seedDefaultData}>
+                            <Upload size={18} />
+                            <span>Seed Default Data</span>
+                        </button>
 
                         <button className="data-btn danger" onClick={resetData}>
                             <RefreshCw size={18} />

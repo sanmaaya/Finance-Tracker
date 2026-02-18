@@ -1,86 +1,78 @@
-# 💰 FinTrack: Your Premium Personal Finance Companion
+# 💰 Paisa Bachao: Your Premium Personal Finance Command Center
 
 [![Made with React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Powered by Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)](https://firebase.google.com/)
-[![Styled with CSS](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://www.w3.org/TR/CSS/)
+[![Built with TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Styled with Premium CSS](https://img.shields.io/badge/Premium--UI-Glassmorphism-purple)](https://www.w3.org/TR/CSS/)
 
-**FinTrack** is a modern, high-performance personal finance tracker designed to provide absolute clarity over your monthly spending. Inspired by premium fintech apps like Toshl, it combines real-time data synchronization with advanced visualizations to help you master your money.
-
----
-
-## ✨ Key Features
-
-### 📊 Professional Dashboard
-- **Financial Overview**: Instant visibility into your Total Balance, Monthly Income, and Monthly Expenses.
-- **Toshl-Inspired Budgeting**: A dedicated "Left to Spend" indicator with real-time progress tracking against your monthly limit.
-- **Smart Insights**: Interactive Hero section providing personalized category breakdown at a glance.
-
-### 🌎 Global Market Feed
-- **Dedicated Market Page**: Live tracking of global currency rates (USD, EUR, GBP, JPY) relative to the **Indian Rupee (INR)**.
-- **Personalized Valuation**: Automatically calculates your total portfolio value in multiple global currencies.
-- **Base Currency Selection**: Instantly switch base currencies to see the market from any perspective.
-
-### 📈 Advanced Visualizations
-- **Cash Flow Analysis**: Smooth Area charts tracking your income vs. expense trends over time.
-- **Category Breakdown**: Premium doughnut charts showing exactly where your money goes.
-
-### 🛠️ Core Functionality
-- **Transaction Management**: Effortlessly add, edit (in-place), or delete transactions with real-time Firebase sync.
-- **Glassmorphism UI**: A stunning, modern design with subtle micro-animations and hover effects.
-- **Themes**: Full support for both **Light** and **Dark** modes to suit your preference.
+**Paisa Bachao** is a state-of-the-art personal finance tracker designed for clarity, elegance, and absolute control. It features a premium glassmorphic interface, real-time data orchestration through Firebase, and deep-dive analytics to transform how you perceive your money.
 
 ---
 
-## 🚀 Tech Stack
+## ✨ Premium Features
 
-- **Frontend**: React 18 (Vite) + TypeScript
-- **Backend/Database**: Firebase Firestore (Real-time sync)
-- **Styling**: Vanilla CSS (Custom Glassmorphism Design System)
-- **Icons**: Lucide-React
-- **Charts**: Recharts
-- **Routing**: React Router v6
+### 📊 Advanced Analytics Hub (New)
+*   **Annual Performance Trends**: Visualize your income vs. expenses across the entire year with a high-precision bar chart.
+*   **Intelligent Category Breakdown**: Dynamic pie charts showing exactly where your money goes, supporting real-time data parsing.
+*   **Automatic Historical Trending**: Smart date parsing that recognizes historical trends even from imported backups.
+
+### 📥 Data Sovereignty & Portability
+*   **Robust Export/Import**: Full backup capability into a structured JSON format. Move your financial history between accounts or devices instantly.
+*   **Metadata Versioning**: Export files include timestamps and versioning to ensure data integrity during restores.
+*   **Cloud Synchronization**: Powered by Firebase Firestore for millisecond-latency data updates across all your devices.
+
+### 💳 Elite Debt & Goal Tracking
+*   **EMI Intelligence**: Track high-value installments (EMIs) for gadgets, loans, or insurance.
+*   **Goal-Oriented Savings**: Specialized tracking for savings goals (like a Tesla fund or dream trip) with visual progress indicators.
+*   **Safe Account Balance**: A specialized metric that calculates your "Safe to Spend" amount by deducting future obligations from current liquidity.
+
+### 📱 Superior Mobile Experience
+*   **Refined Mobile Navigation**: A precision-aligned bottom navigation bar for high-reachability on modern smartphones.
+*   **Safe-Area Optimization**: Designed to avoid interference with the iPhone Dynamic Island and gesture home bars.
+*   **Fluid Responsive Layouts**: Every dashboard card, form, and chart reconfigures itself for the perfect view on any screen size.
 
 ---
 
-## 🛠️ Installation & Setup
+## 🚀 Optimized Tech Stack
 
-1. **Clone the repository:**
+*   **Logic**: React 18 + TypeScript (Strict Type Safety)
+*   **Storage**: Firebase Firestore (Real-time NoSQL)
+*   **Auth**: Firebase Auth (Secure Multi-User Support)
+*   **Charts**: Recharts (Customized with High-DPI support)
+*   **Interactions**: Framer Motion (Smooth Transitions)
+*   **Design**: Custom Design System with CSS Variables (Vibrant Glassmorphism)
+
+---
+
+## 🛠️ Instant Setup
+
+1. **Clone & Install:**
    ```bash
    git clone https://github.com/sanmaaya/Finance-Tracker.git
    cd Finance-Tracker
-   ```
-
-2. **Install dependencies:**
-   ```bash
    npm install
    ```
 
-3. **Configure Firebase:**
-   Create a `.env` file in the root directory and add your Firebase configuration:
+2. **Configure Environment:**
+   Create a `.env` file with your Firebase credentials:
    ```env
-   VITE_FIREBASE_API_KEY=your_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-   VITE_FIREBASE_PROJECT_ID=your_project_id
-   VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   VITE_FIREBASE_APP_ID=your_app_id
+   VITE_FIREBASE_API_KEY=...
+   VITE_FIREBASE_AUTH_DOMAIN=...
+   VITE_FIREBASE_PROJECT_ID=...
+   VITE_FIREBASE_STORAGE_BUCKET=...
+   VITE_FIREBASE_MESSAGING_SENDER_ID=...
+   VITE_FIREBASE_APP_ID=...
    ```
 
-4. **Run locally:**
+3. **Launch Project:**
    ```bash
    npm run dev
    ```
 
 ---
 
-## 📱 Mobile Preview
-FinTrack is fully responsive. Whether you're on a desktop or a smartphone, your financial data is always accessible and beautifully formatted.
+## 📄 Licensing & Credits
+Distributed under the **MIT License**.
 
----
-
-## 📄 License
-This project is open-source and available under the [MIT License](LICENSE).
-
----
-
-*Designed with ❤️ for better financial health.*
+*Built for the ambitious, designed for the organized.*
+*Maintained with ❤️ by sanmaaya.*
