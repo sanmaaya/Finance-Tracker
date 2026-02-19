@@ -4,6 +4,8 @@ import {
   LayoutDashboard,
   TrendingUp,
   LogOut,
+  PieChart as PieIcon,
+  Sun,
   Moon,
   Settings,
   User,
@@ -23,19 +25,22 @@ const Navbar = () => {
     <>
       {/* Mobile Top Header */}
       <div className="mobile-header">
-        <div className="nav-brand">
+        <div className="nav-brand animate-brand">
           <div className="brand-logo-container">
             <img src="/logo.png" alt="Logo" className="brand-logo" />
           </div>
-          <span className="brand-name-main">Paisa</span>
+          <div className="brand-text-wrapper">
+            <span className="brand-name-main">Paise</span>
+            <span className="brand-tagline">Bachaaoo</span>
+          </div>
         </div>
         <div className="mobile-actions">
           <button className="theme-toggle-btn" onClick={toggleTheme}>
             {theme === 'vampire' ? <Ghost size={18} /> :
               theme === 'cyberpunk' ? <Sparkles size={18} /> :
                 theme === 'moonlight' ? <Moon size={18} /> :
-                  theme === 'dark' ? <LayoutDashboard size={18} /> :
-                    <Sparkles size={18} />}
+                  theme === 'dark' ? <Moon size={18} /> :
+                    <Sun size={18} />}
           </button>
           <NavLink to="/settings" className="profile-avatar">
             {user?.photoURL ? <img src={user.photoURL} alt="User" /> : <User size={18} />}
@@ -45,13 +50,13 @@ const Navbar = () => {
 
       <nav className="navbar premium-navbar">
         <div className="container flex items-center justify-between">
-          <NavLink to="/" className="nav-brand flex items-center gap-3">
+          <NavLink to="/" className="nav-brand flex items-center gap-3 animate-brand">
             <div className="brand-logo-container">
               <img src="/logo.png" alt="Logo" className="brand-logo" />
             </div>
             <div className="brand-text-container">
-              <span className="brand-name-main">Paisa</span>
-              <span className="brand-name-sub">Bachao</span>
+              <span className="brand-name-main">Paise</span>
+              <span className="brand-tagline">Bachaaoo</span>
             </div>
           </NavLink>
 
@@ -62,11 +67,15 @@ const Navbar = () => {
             </NavLink>
             <NavLink to="/installments" className={({ isActive }) => isActive ? 'nav-tab active' : 'nav-tab'}>
               <Zap size={18} />
-              <span>Installments</span>
+              <span>Vault</span>
+            </NavLink>
+            <NavLink to="/analytics" className={({ isActive }) => isActive ? 'nav-tab active' : 'nav-tab'}>
+              <PieIcon size={18} />
+              <span>Analytics</span>
             </NavLink>
             <NavLink to="/market" className={({ isActive }) => isActive ? 'nav-tab active' : 'nav-tab'}>
               <TrendingUp size={18} />
-              <span>Analytics</span>
+              <span>Market</span>
             </NavLink>
             {/* Added Settings to mobile tabs for better reachability */}
             <NavLink to="/settings" className={({ isActive }) => isActive ? 'nav-tab active' : 'nav-tab mobile-only'}>
@@ -80,8 +89,8 @@ const Navbar = () => {
               {theme === 'vampire' ? <Ghost size={20} /> :
                 theme === 'cyberpunk' ? <Sparkles size={20} /> :
                   theme === 'moonlight' ? <Moon size={20} /> :
-                    theme === 'dark' ? <LayoutDashboard size={20} /> :
-                      <Sparkles size={20} />}
+                    theme === 'dark' ? <Moon size={20} /> :
+                      <Sun size={20} />}
             </button>
 
             <div className="nav-profile">

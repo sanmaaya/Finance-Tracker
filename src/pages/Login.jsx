@@ -49,7 +49,7 @@ const Login = () => {
                     </div>
                     <h1>{isLogin ? 'Welcome Back' : 'Create Account'}</h1>
                     <p className="subtitle">
-                        {isLogin ? 'Enter your details to access your dashboard.' : 'Join FinTrack to manage your finances today.'}
+                        {isLogin ? 'Enter your details to access your dashboard.' : 'Join Paisa Premium to manage your finances today.'}
                     </p>
                 </div>
 

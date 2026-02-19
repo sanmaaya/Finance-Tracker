@@ -53,19 +53,83 @@
 }
 
 .brand-name-main {
-    font-size: 1.15rem;
-    font-weight: 900;
+    font-size: 1.4rem;
+    font-weight: 1000;
+    font-family: 'Inter', sans-serif;
     color: var(--text-primary);
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
+    background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-.brand-name-sub {
-    font-size: 0.65rem;
-    font-weight: 700;
+.brand-tagline {
+    font-size: 0.6rem;
+    font-weight: 800;
     color: var(--primary);
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 3px;
+    margin-top: -2px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.9;
 }
+
+@keyframes luxury-shimmer {
+    to {
+        background-position: 200% center;
+    }
+}
+
+@keyframes rainbow-shimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-brand:hover .brand-name-main {
+    background: linear-gradient(90deg,
+            #ffffff 0%,
+            #ffd700 20%,
+            #ffffff 40%,
+            var(--primary) 60%,
+            #ffffff 80%,
+            #ffd700 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: luxury-shimmer 1.5s linear infinite;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+}
+
+.animate-brand:hover .brand-logo-container {
+    transform: rotate(360deg) scale(1.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 30px rgba(var(--primary-rgb), 0.5);
+    background: var(--bg-card-hover);
+}
+
+.animate-brand:hover .brand-tagline {
+    letter-spacing: 5px;
+    color: #fff;
+    opacity: 1;
+    text-shadow: 0 0 10px var(--primary);
+}
+
+
 
 .nav-tabs {
     display: flex;

@@ -67,8 +67,8 @@ const Installments = () => {
         >
             <header className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-4xl font-bold tracking-tight mb-2">Installments</h1>
-                    <p className="text-secondary text-sm">Track your recurring monthly obligations</p>
+                    <h1 className="text-4xl font-black tracking-tight mb-2">Premium <span className="text-secondary">Vault</span></h1>
+                    <p className="text-secondary text-sm">Secure and track your long-term financial commitments</p>
                 </div>
                 <div className="flex gap-4">
                     <div className="premium-stat-badge">

@@ -4,18 +4,9 @@ import { Trash2, Edit3, Search, Filter, TrendingUp, TrendingDown, Calendar } fro
 import './TransactionList.css';
 
 const TransactionList = ({ onEdit }) => {
-    const { transactions, deleteTransaction, loading } = useTransactions();
+    const { transactions, deleteTransaction, loading, currency, currencySymbol } = useTransactions();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('all');
-
-    const currency = localStorage.getItem('pref_currency') || 'INR';
-    const currencySymbols = {
-        INR: '₹',
-        USD: '$',
-        EUR: '€',
-        GBP: '£',
-        JPY: '¥'
-    };
 
     const filteredTransactions = transactions.filter(t => {
         const matchesSearch = t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -93,7 +84,7 @@ const TransactionList = ({ onEdit }) => {
                             <div className="item-right">
                                 <span className={`item-amount ${transaction.type === 'income' ? 'text-income' : 'text-expense'}`}>
                                     {transaction.type === 'income' ? '+' : '-'}
-                                    {currencySymbols[currency] || '₹'}{Math.abs(transaction.amount).toLocaleString(currency === 'INR' ? 'en-IN' : 'en-US')}
+                                    {currencySymbol}{Math.abs(transaction.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                                 <div className="item-actions">
                                     <button

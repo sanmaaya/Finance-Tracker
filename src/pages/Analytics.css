@@ -1,0 +1,129 @@
+/* Spending Analytics Page Styles */
+.analytics-page {
+    padding: 1.25rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (min-width: 769px) {
+    .analytics-page {
+        padding: 2rem;
+    }
+}
+
+.analytics-header-refined {
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+@media (max-width: 640px) {
+    .analytics-header-refined {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+}
+
+.analytics-title {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.analytics-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+
+.analytics-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas:
+        "main main side"
+        "history history history";
+    gap: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+    .analytics-layout {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "main"
+            "side"
+            "history";
+    }
+}
+
+.chart-main-card {
+    grid-area: main;
+}
+
+.chart-side-card {
+    grid-area: side;
+}
+
+.history-full-area {
+    grid-area: history;
+    margin-top: 1rem;
+}
+
+/* Toggle Buttons */
+.analytics-toggle {
+    padding: 0.25rem;
+    display: flex;
+    border-radius: 14px;
+    background: var(--bg-card);
+}
+
+.toggle-btn {
+    padding: 0.6rem 1.25rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    transition: all 0.3s;
+}
+
+.toggle-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+@media (max-width: 640px) {
+    .analytics-actions {
+        width: 100%;
+    }
+
+    .analytics-toggle {
+        width: 100%;
+    }
+
+    .toggle-btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* Custom Chart Tooltips */
+.recharts-tooltip-wrapper {
+    outline: none !important;
+}
+
+@media (max-width: 480px) {
+    .chart-wrapper {
+        height: 250px !important;
+    }
+
+    .chart-side-card {
+        padding: 1.25rem !important;
+    }
+}

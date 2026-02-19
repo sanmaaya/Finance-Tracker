@@ -330,7 +330,7 @@ const DashboardLayout = () => {
                 <div className="premium-card market-bar">
                     <div className="card-header">
                         <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-1">
-                            <PieIcon size={12} className="text-primary" /> Category Distribution
+                            <PieIcon size={12} className="text-primary" /> Spending Breakdown
                         </div>
                     </div>
                     <div className="flex gap-8 items-center mt-4 spending-analytics-wrapper">
@@ -395,7 +395,7 @@ const DashboardLayout = () => {
                 <div className="premium-card history-card">
                     <div className="card-header flex justify-between items-center mb-6">
                         <h3 className="card-title">Recent Activity</h3>
-                        <button className="text-[10px] font-bold uppercase tracking-widest text-primary hover:opacity-70" onClick={() => navigate('/market')}>View All</button>
+                        <button className="text-[10px] font-bold uppercase tracking-widest text-primary hover:opacity-70" onClick={() => navigate('/analytics')}>View All</button>
                     </div>
                     <div className="flex flex-col gap-4">
                         {recentTransactions.map(tx => (

@@ -1,15 +1,26 @@
-# 💰 Paisa Bachao: Your Premium Personal Finance Command Center
+# 💰 Paise Bachaaoo: Your Premium Financial Command Center
 
 [![Made with React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Powered by Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)](https://firebase.google.com/)
 [![Built with TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Styled with Premium CSS](https://img.shields.io/badge/Premium--UI-Glassmorphism-purple)](https://www.w3.org/TR/CSS/)
+[![Styled with Premium CSS](https://img.shields.io/badge/Premium--UI-Luxury--Glassmorphism-gold)](https://www.w3.org/TR/CSS/)
 
-**Paisa Bachao** is a state-of-the-art personal finance tracker designed for clarity, elegance, and absolute control. It features a premium glassmorphic interface, real-time data orchestration through Firebase, and deep-dive analytics to transform how you perceive your money.
+**Paise Bachaaoo** is a state-of-the-art personal finance tracker designed for absolute clarity, luxury aesthetics, and real-time market precision. Featuring a premium "Rainbow Metallic" branding system and deep-dive global market insights, it transforms the way you manage and grow your wealth.
 
 ---
 
-## ✨ New: The "Midnight Premium" 2.0 Update
+## ✨ New: The "Luxury Market" 3.0 Update
+
+### 💎 Animated Luxury Branding
+*   **Rainbow Metallic Shimmer**: A custom-engineered shimmer effect on the brand name that flows with gold and silver tones on hover.
+*   **Kinetic Vault Logo**: Interactive 360-degree rotating logo with proximity-based glow effects.
+*   **Premium Typography**: High-density "Inter" font weights with vertical chrome gradients.
+
+### 📈 Professional Market Dashboard
+*   **Live Overview Row**: Real-time tracking of global benchmarks including the **DXY Index**, **EUR/USD**, and **GBP/USD**.
+*   **Market Sentiment Analysis**: Integrated "Bullish/Bearish" indicators and dynamic volatility scoring.
+*   **Session Status Tracking**: Live indicators for market session openings (e.g., Asian Session) with animated pulse notifications.
+*   **Base Stability Index (BSI)**: Proprietary visualization of your domestic currency strength against a global basket.
 
 ### 🌓 5 High-Octane Premium Themes
 *   **Vampire**: Deep blood reds and deep blacks.
@@ -18,30 +29,19 @@
 *   **Midnight**: Dark charcoal with high-contrast text.
 *   **Light/Cloud**: A curated, premium light mode that stays readable while maintaining the glass aesthetic.
 
-### 📈 Intelligent Live Goals
-*   **Sparkline Micro-Charts**: Every saving goal now features a live "pulse" graph that visualizes your pending vs. paid status in real-time.
-*   **Progress Rings**: Dual-visualization using both circular and horizontal progress bars for maximum clarity.
-*   **One-Tap Details**: Jump from your dashboard directly into your installment plans with deep-linked navigation.
-
 ### 🔒 Professional Data Sync Architecture
 *   **User-Specific Keys**: Local storage isolation per user. Your data stays separate even on shared computers.
-*   **Legacy Data Migration**: Automatic detection and migration of older data formats to the new secured architecture.
 *   **One-Tap Vault Sync**: Smart banners detect unsynced local changes and offer a "Sync to Vault" action to ensure your data is backed up to the cloud instantly.
-
-### 📱 Precision Mobile Optimization
-*   **Anti-Zoom Technology**: Prevents annoying browser "auto-zooms" on mobile inputs for a native-app feel.
-*   **Unbreakable Forms**: Redesigned modal system with intelligent overflow support—submit buttons are always reachable regardless of screen height.
-*   **Responsive Stack Logic**: Cards and headers intelligently reposition themselves on mobile for the best ergonomic experience.
 
 ---
 
 ## 🚀 Optimized Tech Stack
 
-*   **Logic**: React 18 + TypeScript (Strict Type Safety)
+*   **Logic**: React 18 + JavaScript/JSX (High Performance)
 *   **Storage**: Firebase Firestore (Real-time NoSQL)
 *   **Auth**: Firebase Auth (Secure Multi-User Support)
 *   **Charts**: Recharts (Deeply integrated with the 5-theme system)
-*   **Interactions**: Framer Motion (Smooth, buttery transitions)
+*   **Interactions**: Custom CSS Keyframe Orchestration + Lucide Icons
 *   **Design**: Custom Design System with RGB-aware CSS Variables
 
 ---

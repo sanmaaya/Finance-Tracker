@@ -1,10 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Settings from './pages/Settings';
 import Market from './pages/Market';
+import Analytics from './pages/Analytics';
 import Installments from './pages/Installments';
 import { TransactionProvider } from './context/TransactionContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -24,7 +26,7 @@ const AppContent = () => {
     setEditingTransaction
   } = useTransactions();
 
-  if (loading) return <div className="loading-screen">Loading Paisa!...</div>;
+  if (loading) return <div className="loading-screen">Loading Paisa Premium...</div>;
 
   const handleCloseForm = () => {
     setIsFormOpen(false);
@@ -46,9 +48,11 @@ const AppContent = () => {
           <Route path="/installments" element={user ? <Installments /> : <Navigate to="/login" />} />
           <Route path="/settings" element={user ? <Settings /> : <Navigate to="/login" />} />
           <Route path="/market" element={user ? <Market /> : <Navigate to="/login" />} />
+          <Route path="/analytics" element={user ? <Analytics /> : <Navigate to="/login" />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
+      {user && <Footer />}
 
       {isFormOpen && (
         <div className="modal-overlay">
