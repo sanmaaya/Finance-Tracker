@@ -1,18 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut, updateProfile, type User } from 'firebase/auth';
+import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase/firebase';
 
-interface AuthContextType {
-    user: User | null;
-    loading: boolean;
-    logout: () => Promise<void>;
-    updateUsername: (name: string) => Promise<void>;
-}
+const AuthContext = createContext(undefined);
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -26,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = () => signOut(auth);
 
-    const updateUsername = async (name: string) => {
+    const updateUsername = async (name) => {
         if (auth.currentUser) {
             await updateProfile(auth.currentUser, { displayName: name });
             // Refresh user state

@@ -5,7 +5,7 @@ import { Wallet, Mail, Lock, ArrowRight, Sun, Moon } from 'lucide-react';
 import './Login.css';
 import { useTheme } from '../context/ThemeContext';
 
-const Login: React.FC = () => {
+const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -13,7 +13,7 @@ const Login: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const { theme, toggleTheme } = useTheme();
 
-    const handleAuth = async (e: React.FormEvent) => {
+    const handleAuth = async (e) => {
         e.preventDefault();
         setError('');
 
@@ -30,7 +30,7 @@ const Login: React.FC = () => {
             } else {
                 await createUserWithEmailAndPassword(auth, email, password);
             }
-        } catch (err: any) {
+        } catch (err) {
             setError(err.message);
         } finally {
             setIsLoading(false);

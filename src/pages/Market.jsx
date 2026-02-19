@@ -20,7 +20,7 @@ import {
 import TransactionList from '../components/transactions/TransactionList';
 import './Market.css';
 
-const Market: React.FC = () => {
+const Market = () => {
     const {
         transactions,
         currencySymbol: symbol,
@@ -28,9 +28,9 @@ const Market: React.FC = () => {
         setEditingTransaction
     } = useTransactions();
 
-    const [activeTab, setActiveTab] = useState<'spending' | 'income'>('spending');
+    const [activeTab, setActiveTab] = useState('spending');
 
-    const parseDate = (date: any): Date => {
+    const parseDate = (date) => {
         if (!date) return new Date();
         if (typeof date.toDate === 'function') return date.toDate();
         if (date.seconds !== undefined) return new Date(date.seconds * 1000);
@@ -38,7 +38,7 @@ const Market: React.FC = () => {
         return isNaN(parsed.getTime()) ? new Date() : parsed;
     };
 
-    const handleEdit = (tx: any) => {
+    const handleEdit = (tx) => {
         setEditingTransaction(tx);
         setIsFormOpen(true);
     };
@@ -52,7 +52,7 @@ const Market: React.FC = () => {
                 const amount = Number(t.amount) || 0;
                 acc[t.category] = (acc[t.category] || 0) + amount;
                 return acc;
-            }, {} as Record<string, number>);
+            }, {});
 
         return Object.entries(map)
             .map(([name, value]) => ({ name, value }))

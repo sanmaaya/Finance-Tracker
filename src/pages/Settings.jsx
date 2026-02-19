@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useTransactions } from '../context/TransactionContext';
 import './Settings.css';
 
-const Settings: React.FC = () => {
+const Settings = () => {
     const { user, updateUsername } = useAuth();
     const { theme, setTheme } = useTheme();
     const {
@@ -35,7 +35,7 @@ const Settings: React.FC = () => {
         monthlyBudget: localStorage.getItem('pref_monthlyBudget') || '50000'
     });
 
-    const [categories, setCategories] = useState<string[]>(() => {
+    const [categories, setCategories] = useState(() => {
         const saved = localStorage.getItem('pref_categories');
         return saved ? JSON.parse(saved) : [
             'Food & Drinks', 'Shopping', 'Housing', 'Transportation',
@@ -45,7 +45,7 @@ const Settings: React.FC = () => {
 
     const [newCategory, setNewCategory] = useState('');
 
-    const themes: { id: any, name: string, color: string }[] = [
+    const themes = [
         { id: 'vampire', name: 'Vampire', color: '#ff0000' },
         { id: 'cyberpunk', name: 'Cyberpunk', color: '#f0abfc' },
         { id: 'moonlight', name: 'Moonlight', color: '#94a3b8' },
@@ -53,7 +53,7 @@ const Settings: React.FC = () => {
         { id: 'light', name: 'Cloud', color: '#fafaf9' }
     ];
 
-    const handleProfileSave = async (e?: React.FormEvent | React.MouseEvent) => {
+    const handleProfileSave = async (e) => {
         if (e) e.preventDefault();
 
         try {
@@ -79,7 +79,7 @@ const Settings: React.FC = () => {
         }
     };
 
-    const removeCategory = (cat: string) => {
+    const removeCategory = (cat) => {
         setCategories(categories.filter(c => c !== cat));
     };
 
@@ -111,14 +111,14 @@ const Settings: React.FC = () => {
         }
     };
 
-    const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImport = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         const reader = new FileReader();
         reader.onload = async (event) => {
             try {
-                const imported = JSON.parse(event.target?.result as string);
+                const imported = JSON.parse(event.target?.result);
 
                 if (!imported.transactions && !imported.installments) {
                     throw new Error("Invalid file format");
@@ -128,7 +128,7 @@ const Settings: React.FC = () => {
                     await importAllData(imported);
                     alert('Data imported successfully! 🚀');
                 }
-            } catch (err: any) {
+            } catch (err) {
                 console.error(err);
                 if (err.code === 'permission-denied') {
                     alert('Permission Denied: Your Firebase security rules are blocking this import.');

@@ -4,13 +4,7 @@ import { useTransactions } from '../../context/TransactionContext';
 
 import './Cards.css';
 
-interface SummaryProps {
-    totalBalance: number;
-    totalIncome: number;
-    totalExpense: number;
-}
-
-const Cards: React.FC<SummaryProps> = ({ totalBalance, totalIncome, totalExpense }) => {
+const Cards = ({ totalBalance, totalIncome, totalExpense }) => {
     const { currencySymbol } = useTransactions();
 
     const formatCurrency = (amount: number) => {

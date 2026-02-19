@@ -1,7 +1,7 @@
 import DashboardLayout from '../components/dashboard/Dashboard';
 import './Dashboard.css';
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
 
     // Theme is now managed globally by useTheme
 

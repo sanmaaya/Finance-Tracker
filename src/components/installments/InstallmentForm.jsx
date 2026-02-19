@@ -3,11 +3,7 @@ import { X, Calendar, DollarSign, Tag, PieChart, Info } from 'lucide-react';
 import { useTransactions } from '../../context/TransactionContext';
 import './InstallmentForm.css';
 
-interface InstallmentFormProps {
-    onClose: () => void;
-}
-
-const InstallmentForm: React.FC<InstallmentFormProps> = ({ onClose }) => {
+const InstallmentForm = ({ onClose }) => {
     const { addInstallment, updateInstallment, currencySymbol, editingInstallment, setEditingInstallment } = useTransactions();
     const [loading, setLoading] = useState(false);
 
@@ -19,7 +15,7 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({ onClose }) => {
         paidMonths: '0',
         startDate: new Date().toISOString().split('T')[0],
         category: 'Electronics',
-        type: 'debt' as 'debt' | 'goal'
+        type: 'debt'
     });
 
     useEffect(() => {
@@ -40,7 +36,7 @@ const InstallmentForm: React.FC<InstallmentFormProps> = ({ onClose }) => {
 
     const categories = ['Electronics', 'Transport', 'Life', 'Health', 'Subscription', 'Education', 'Others'];
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 

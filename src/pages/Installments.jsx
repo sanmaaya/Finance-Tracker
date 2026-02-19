@@ -16,7 +16,7 @@ import { motion } from 'framer-motion';
 import { useTransactions } from '../context/TransactionContext';
 import './Installments.css';
 
-const Installments: React.FC = () => {
+const Installments = () => {
     const {
         installments,
         setIsInstallmentFormOpen,
@@ -32,13 +32,13 @@ const Installments: React.FC = () => {
     const totalRemainingDebt = debts.reduce((sum, item) => sum + (item.totalAmount - (item.monthlyEmi * item.paidMonths)), 0);
 
 
-    const handleEdit = (item: any) => {
+    const handleEdit = (item) => {
         setEditingInstallment(item);
         setIsInstallmentFormOpen(true);
     };
 
 
-    const getIcon = (category: string) => {
+    const getIcon = (category) => {
         switch (category) {
             case 'Electronics': return <Smartphone size={24} />;
             case 'Transport': return <Car size={24} />;
@@ -48,7 +48,7 @@ const Installments: React.FC = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this installment plan?')) {
             await deleteInstallment(id);
         }

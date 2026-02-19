@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
-import { useTransactions, type Transaction } from '../../context/TransactionContext';
+import { useTransactions } from '../../context/TransactionContext';
 import { Trash2, Edit3, Search, Filter, TrendingUp, TrendingDown, Calendar } from 'lucide-react';
 import './TransactionList.css';
 
-interface ListProps {
-    onEdit: (transaction: Transaction) => void;
-}
-
-const TransactionList: React.FC<ListProps> = ({ onEdit }) => {
+const TransactionList = ({ onEdit }) => {
     const { transactions, deleteTransaction, loading } = useTransactions();
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
+    const [filterType, setFilterType] = useState('all');
 
     const currency = localStorage.getItem('pref_currency') || 'INR';
-    const currencySymbols: Record<string, string> = {
+    const currencySymbols = {
         INR: '₹',
         USD: '$',
         EUR: '€',
@@ -29,7 +25,7 @@ const TransactionList: React.FC<ListProps> = ({ onEdit }) => {
         return matchesSearch && matchesType;
     });
 
-    const formatDate = (date: any) => {
+    const formatDate = (date) => {
         if (!date) return '';
         const d = date.toDate ? date.toDate() : new Date(date);
         return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -59,7 +55,7 @@ const TransactionList: React.FC<ListProps> = ({ onEdit }) => {
                         <Filter size={18} className="filter-icon" />
                         <select
                             value={filterType}
-                            onChange={(e) => setFilterType(e.target.value as any)}
+                            onChange={(e) => setFilterType(e.target.value)}
                         >
                             <option value="all">All Types</option>
                             <option value="income">Income Only</option>

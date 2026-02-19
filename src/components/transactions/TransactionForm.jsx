@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useTransactions, type Transaction } from '../../context/TransactionContext';
+import { useTransactions } from '../../context/TransactionContext';
 import { Plus, X, DollarSign, Tag, Calendar, FileText } from 'lucide-react';
 import './TransactionForm.css';
 
-interface FormProps {
-    onClose?: () => void;
-    editData?: Transaction;
-}
-
-const TransactionForm: React.FC<FormProps> = ({ onClose, editData }) => {
+const TransactionForm = ({ onClose, editData }) => {
     const { addTransaction, updateTransaction } = useTransactions();
     const [formData, setFormData] = useState({
         title: '',
         amount: '',
         category: '',
-        type: 'expense' as 'income' | 'expense',
+        type: 'expense',
         date: new Date().toISOString().split('T')[0]
     });
     const [submitting, setSubmitting] = useState(false);
 
-    const categories: string[] = JSON.parse(localStorage.getItem('pref_categories') || '["Food & Drinks", "Shopping", "Housing", "Transportation", "Entertainment", "Salary", "Investment", "Others"]');
+    const categories = JSON.parse(localStorage.getItem('pref_categories') || '["Food & Drinks", "Shopping", "Housing", "Transportation", "Entertainment", "Salary", "Investment", "Others"]');
 
     useEffect(() => {
         if (editData) {
@@ -35,7 +30,7 @@ const TransactionForm: React.FC<FormProps> = ({ onClose, editData }) => {
         }
     }, [editData]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.title || !formData.amount || !formData.category) return;
 

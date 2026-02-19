@@ -30,7 +30,7 @@ import { useTransactions } from '../../context/TransactionContext';
 import { useAuth } from '../../context/AuthContext';
 import './Dashboard.css';
 
-const DashboardLayout: React.FC = () => {
+const DashboardLayout = () => {
     const {
         transactions,
         installments,
@@ -48,7 +48,7 @@ const DashboardLayout: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const parseDate = (date: any): Date => {
+    const parseDate = (date) => {
         if (!date) return new Date();
         if (typeof date.toDate === 'function') return date.toDate();
         if (date.seconds !== undefined) return new Date(date.seconds * 1000);
@@ -62,14 +62,7 @@ const DashboardLayout: React.FC = () => {
     };
 
     const monthlyData = useMemo(() => {
-        interface MonthData {
-            name: string;
-            income: number;
-            expense: number;
-            month: number;
-            year: number;
-        }
-        const last6Months: MonthData[] = [];
+        const last6Months = [];
         const now = new Date();
         for (let i = 5; i >= 0; i--) {
             const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -105,20 +98,20 @@ const DashboardLayout: React.FC = () => {
     const categoryData = useMemo(() => {
         const categoryMap = transactions
             .filter(t => t.type === 'expense')
-            .reduce((acc: any, t) => {
+            .reduce((acc, t) => {
                 acc[t.category] = (acc[t.category] || 0) + t.amount;
                 return acc;
             }, {});
 
         return Object.entries(categoryMap)
             .map(([name, value]) => ({ name, value }))
-            .sort((a: any, b: any) => (b.value as number) - (a.value as number))
+            .sort((a, b) => b.value - a.value)
             .slice(0, 5);
     }, [transactions]);
 
     const COLORS = ['#7c3af2', '#2cd1c1', '#f59e0b', '#10b981', '#ef4444'];
 
-    const formatTimeAgo = (date: any) => {
+    const formatTimeAgo = (date) => {
         if (!date) return 'Some time ago';
         const d = parseDate(date);
         const now = new Date();
@@ -390,7 +383,7 @@ const DashboardLayout: React.FC = () => {
                                         </span>
                                     </div>
                                     <span className="text-[11px] font-black text-primary">
-                                        {Math.round(((entry.value as number) / (categoryData.reduce((acc, b) => acc + (b.value as number), 0) || 1)) * 100)}%
+                                        {Math.round((entry.value / (categoryData.reduce((acc, b) => acc + b.value, 0) || 1)) * 100)}%
                                     </span>
                                 </div>
                             ))}

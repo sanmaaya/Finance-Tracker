@@ -13,73 +13,15 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 
-export interface Transaction {
-    id: string;
-    title: string;
-    amount: number;
-    category: string;
-    type: 'income' | 'expense';
-    date: any;
-    createdAt: any;
-    userId: string;
-}
+const TransactionContext = createContext(undefined);
 
-export interface Installment {
-    id: string;
-    name: string;
-    totalAmount: number;
-    monthlyEmi: number;
-    tenure: number;
-    paidMonths: number;
-    startDate: any;
-    category: string;
-    type: 'debt' | 'goal';
-    userId: string;
-    createdAt: any;
-}
-
-
-interface TransactionContextType {
-    transactions: Transaction[];
-    installments: Installment[];
-    loading: boolean;
-    addTransaction: (transaction: Omit<Transaction, 'id' | 'createdAt' | 'userId'>) => Promise<void>;
-    deleteTransaction: (id: string) => Promise<void>;
-    updateTransaction: (id: string, updates: Partial<Transaction>) => Promise<void>;
-    addInstallment: (installment: Omit<Installment, 'id' | 'createdAt' | 'userId'>) => Promise<void>;
-    deleteInstallment: (id: string) => Promise<void>;
-    updateInstallment: (id: string, updates: Partial<Installment>) => Promise<void>;
-    totalBalance: number;
-    totalIncome: number;
-    totalExpense: number;
-    isFormOpen: boolean;
-    setIsFormOpen: (open: boolean) => void;
-    isInstallmentFormOpen: boolean;
-    setIsInstallmentFormOpen: (open: boolean) => void;
-    editingTransaction: Transaction | null;
-    setEditingTransaction: (transaction: Transaction | null) => void;
-    editingInstallment: Installment | null;
-    setEditingInstallment: (installment: Installment | null) => void;
-    currency: string;
-    currencySymbol: string;
-    updateCurrency: (currency: string) => void;
-    safeBalance: number;
-    seedDefaultData: () => Promise<void>;
-    resetAllData: () => Promise<void>;
-    importAllData: (data: { transactions: any[], installments: any[] }) => Promise<void>;
-    syncLocalToCloud: () => Promise<void>;
-    needsSync: boolean;
-}
-
-const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
-
-export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TransactionProvider = ({ children }) => {
     // Initialize from localStorage for instant offline access
-    const [transactions, setTransactions] = useState<Transaction[]>(() => {
+    const [transactions, setTransactions] = useState(() => {
         const saved = localStorage.getItem('paisa_transactions');
         return saved ? JSON.parse(saved) : [];
     });
-    const [installments, setInstallments] = useState<Installment[]>(() => {
+    const [installments, setInstallments] = useState(() => {
         const saved = localStorage.getItem('paisa_installments');
         return saved ? JSON.parse(saved) : [];
     });
@@ -87,15 +29,15 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const [loading, setLoading] = useState(true);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isInstallmentFormOpen, setIsInstallmentFormOpen] = useState(false);
-    const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
-    const [editingInstallment, setEditingInstallment] = useState<Installment | null>(null);
+    const [editingTransaction, setEditingTransaction] = useState(null);
+    const [editingInstallment, setEditingInstallment] = useState(null);
     const [currency, setCurrency] = useState(localStorage.getItem('pref_currency') || 'USD');
     const { user, loading: authLoading } = useAuth();
     const [isInitialized, setIsInitialized] = useState(false);
     const [needsSync, setNeedsSync] = useState(false);
 
     // User-specific localStorage keys to prevent data clashing
-    const getStorageKey = (type: 'transactions' | 'installments') => {
+    const getStorageKey = (type) => {
         return user ? `paisa_${type}_${user.uid}` : `paisa_${type}_local`;
     };
 
@@ -122,7 +64,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }
     }, [currency]);
 
-    const updateCurrency = (newCurrency: string) => {
+    const updateCurrency = (newCurrency) => {
         setCurrency(newCurrency);
         localStorage.setItem('pref_currency', newCurrency);
     };
@@ -193,7 +135,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 const transData = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                })) as Transaction[];
+                }));
 
                 // Sort in memory to bypass Firebase Index requirement temporarily
                 const sortedData = transData.sort((a, b) => {
@@ -216,7 +158,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
                 if (!isInitialized) setIsInitialized(true);
             },
-            (error: any) => {
+            (error) => {
                 console.error("Firestore Error (Transactions):", error);
                 if (error.code === 'permission-denied') {
                     alert("⚠️ Firebase Access Denied: Your security rules are blocking data. Please check the 'Security Rules' instructions I sent.");
@@ -242,7 +184,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 const instData = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                })) as Installment[];
+                }));
                 console.log(`📡 [Sync] Fetched ${instData.length} installments for user ${user.uid}`);
 
                 if (instData.length === 0 && installments.length > 0 && !isInitialized) {
@@ -254,7 +196,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 setLoading(false);
                 if (!isInitialized) setIsInitialized(true);
             },
-            (error: any) => {
+            (error) => {
                 console.error("Firestore Error (Installments):", error);
                 if (error.code === 'permission-denied') {
                     // One alert is enough, but logging is good
@@ -270,7 +212,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
         };
     }, [user, authLoading]);
 
-    const addTransaction = async (transaction: Omit<Transaction, 'id' | 'createdAt' | 'userId'>) => {
+    const addTransaction = async (transaction) => {
         if (!user) return;
         await addDoc(collection(db, 'transactions'), {
             ...transaction,
@@ -280,17 +222,17 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
         });
     };
 
-    const deleteTransaction = async (id: string) => {
+    const deleteTransaction = async (id) => {
         await deleteDoc(doc(db, 'transactions', id));
     };
 
-    const updateTransaction = async (id: string, updates: Partial<Transaction>) => {
+    const updateTransaction = async (id, updates) => {
         const sanitized = { ...updates };
         if (sanitized.amount !== undefined) sanitized.amount = Number(sanitized.amount);
         await updateDoc(doc(db, 'transactions', id), sanitized);
     };
 
-    const addInstallment = async (installment: Omit<Installment, 'id' | 'createdAt' | 'userId'>) => {
+    const addInstallment = async (installment) => {
         if (!user) return;
         await addDoc(collection(db, 'installments'), {
             ...installment,
@@ -301,11 +243,11 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
         });
     };
 
-    const deleteInstallment = async (id: string) => {
+    const deleteInstallment = async (id) => {
         await deleteDoc(doc(db, 'installments', id));
     };
 
-    const updateInstallment = async (id: string, updates: Partial<Installment>) => {
+    const updateInstallment = async (id, updates) => {
         const sanitized = { ...updates };
         if (sanitized.totalAmount !== undefined) sanitized.totalAmount = Number(sanitized.totalAmount);
         if (sanitized.monthlyEmi !== undefined) sanitized.monthlyEmi = Number(sanitized.monthlyEmi);
@@ -348,7 +290,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }
     };
 
-    const importAllData = async (data: { transactions: any[], installments: any[] }) => {
+    const importAllData = async (data) => {
         if (!user) {
             alert("Please login to import data.");
             return;
@@ -356,7 +298,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
         setLoading(true);
         try {
-            const promises: Promise<any>[] = [];
+            const promises = [];
 
             if (data.transactions && Array.isArray(data.transactions)) {
                 data.transactions.forEach(t => {
@@ -388,7 +330,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
             }
 
             await Promise.all(promises);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Import operation failed:", error);
             if (error.code === 'permission-denied') {
                 alert("Firebase Permission Denied: Please check your Firestore Security Rules.");
@@ -450,14 +392,14 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
             ];
 
             for (const t of demoTransactions) {
-                await addTransaction(t as any);
+                await addTransaction(t);
             }
             for (const i of demoInstallments) {
-                await addInstallment(i as any);
+                await addInstallment(i);
             }
 
             alert('Paisa has been reloaded with premium demo data! 🚀');
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
             if (error.code === 'permission-denied') {
                 alert('Firebase Forbidden: Your Firestore rules are blocking the demo data seeding. Please check your security rules.');

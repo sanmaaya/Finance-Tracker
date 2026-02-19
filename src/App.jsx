@@ -13,7 +13,7 @@ import { useTransactions } from './context/TransactionContext';
 import TransactionForm from './components/transactions/TransactionForm';
 import InstallmentForm from './components/installments/InstallmentForm';
 
-const AppContent: React.FC = () => {
+const AppContent = () => {
   const { user, loading } = useAuth();
   const {
     isFormOpen,
@@ -76,7 +76,7 @@ const AppContent: React.FC = () => {
 };
 
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <Router>
       <ThemeProvider>
