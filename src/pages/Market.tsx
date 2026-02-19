@@ -121,8 +121,9 @@ const Market: React.FC = () => {
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
                                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
                                 <Tooltip
-                                    contentStyle={{ background: '#0f1014', border: '1px solid var(--border)', borderRadius: '16px' }}
+                                    contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', color: 'var(--text-primary)' }}
                                     cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                                    itemStyle={{ color: 'var(--text-primary)' }}
                                 />
                                 <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} />
                                 <Bar dataKey="income" name="Income" fill="#2cd1c1" radius={[4, 4, 0, 0]} />
@@ -154,7 +155,7 @@ const Market: React.FC = () => {
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip contentStyle={{ background: '#0f1014', border: '1px solid var(--border)', borderRadius: '12px' }} />
+                                <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', color: 'var(--text-primary)' }} />
                             </PieChart>
                         </ResponsiveContainer>
                     </div>

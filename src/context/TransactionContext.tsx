@@ -9,7 +9,6 @@ import {
     deleteDoc,
     doc,
     updateDoc,
-    orderBy,
     Timestamp
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
@@ -68,6 +67,8 @@ interface TransactionContextType {
     seedDefaultData: () => Promise<void>;
     resetAllData: () => Promise<void>;
     importAllData: (data: { transactions: any[], installments: any[] }) => Promise<void>;
+    syncLocalToCloud: () => Promise<void>;
+    needsSync: boolean;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -91,19 +92,25 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const [currency, setCurrency] = useState(localStorage.getItem('pref_currency') || 'USD');
     const { user, loading: authLoading } = useAuth();
     const [isInitialized, setIsInitialized] = useState(false);
+    const [needsSync, setNeedsSync] = useState(false);
+
+    // User-specific localStorage keys to prevent data clashing
+    const getStorageKey = (type: 'transactions' | 'installments') => {
+        return user ? `paisa_${type}_${user.uid}` : `paisa_${type}_local`;
+    };
 
     // Persist to localStorage whenever state changes, but ONLY after initial fetch
     useEffect(() => {
         if (isInitialized) {
-            localStorage.setItem('paisa_transactions', JSON.stringify(transactions));
+            localStorage.setItem(getStorageKey('transactions'), JSON.stringify(transactions));
         }
-    }, [transactions, isInitialized]);
+    }, [transactions, isInitialized, user]);
 
     useEffect(() => {
         if (isInitialized) {
-            localStorage.setItem('paisa_installments', JSON.stringify(installments));
+            localStorage.setItem(getStorageKey('installments'), JSON.stringify(installments));
         }
-    }, [installments, isInitialized]);
+    }, [installments, isInitialized, user]);
 
     const currencySymbol = useMemo(() => {
         switch (currency) {
@@ -126,13 +133,51 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
         if (!user) {
             // User is definitely not logged in
-            setTransactions([]);
-            setInstallments([]);
-            localStorage.removeItem('paisa_transactions');
-            localStorage.removeItem('paisa_installments');
+            // Try to load local-only data if it exists
+            const localSaved = localStorage.getItem('paisa_transactions_local');
+            if (localSaved) setTransactions(JSON.parse(localSaved));
+            else setTransactions([]);
+
+            const localInstSaved = localStorage.getItem('paisa_installments_local');
+            if (localInstSaved) setInstallments(JSON.parse(localInstSaved));
+            else setInstallments([]);
+
             setLoading(false);
             setIsInitialized(true);
             return;
+        }
+
+        // Check for migration from old agnostic keys to user-specific or local keys
+        const oldTransRaw = localStorage.getItem('paisa_transactions');
+        const oldInstRaw = localStorage.getItem('paisa_installments');
+
+        if (oldTransRaw || oldInstRaw) {
+            console.log("🛠️ [Migration] Detected legacy data. Preparing for safe Cloud Sync...");
+
+            try {
+                // Parse the legacy data
+                const oldTransactions = oldTransRaw ? JSON.parse(oldTransRaw) : [];
+                const oldInstallments = oldInstRaw ? JSON.parse(oldInstRaw) : [];
+
+                // Move to user-specific keys immediately as a backup
+                if (oldTransRaw) localStorage.setItem(`paisa_transactions_${user.uid}`, oldTransRaw);
+                if (oldInstRaw) localStorage.setItem(`paisa_installments_${user.uid}`, oldInstRaw);
+
+                // If Firestore is currently empty (we'll check this in the snapshots), 
+                // we should offer to upload this local data.
+                // For now, let's keep it in state so the user sees it immediately.
+                if (oldTransactions.length > 0 || oldInstallments.length > 0) {
+                    setTransactions(oldTransactions);
+                    setInstallments(oldInstallments);
+                    setNeedsSync(true); // Flag that local data needs cloud push
+                }
+
+                // Clear legacy keys to prevent re-migration
+                localStorage.removeItem('paisa_transactions');
+                localStorage.removeItem('paisa_installments');
+            } catch (e) {
+                console.error("Migration failed:", e);
+            }
         }
 
         setLoading(true);
@@ -140,8 +185,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
         // Transactions listener with better error handling
         const qTransactions = query(
             collection(db, 'transactions'),
-            where('userId', '==', user.uid),
-            orderBy('date', 'desc')
+            where('userId', '==', user.uid)
         );
 
         const unsubscribeTransactions = onSnapshot(qTransactions,
@@ -150,13 +194,37 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
                     id: doc.id,
                     ...doc.data()
                 })) as Transaction[];
-                setTransactions(transData);
+
+                // Sort in memory to bypass Firebase Index requirement temporarily
+                const sortedData = transData.sort((a, b) => {
+                    const dateA = a.date?.toDate ? a.date.toDate() : new Date(a.date || 0);
+                    const dateB = b.date?.toDate ? b.date.toDate() : new Date(b.date || 0);
+                    return (dateB.getTime() || 0) - (dateA.getTime() || 0);
+                });
+
+                console.log(`📡 [Sync] Fetched ${transData.length} transactions for user ${user.uid}`);
+
+                // CRITICAL: If Firestore is empty but we have local data from migration, 
+                // we SHOULD NOT overwrite with empty list immediately.
+                // Instead, we favor Firestore but log the discrepancy.
+                if (transData.length === 0 && transactions.length > 0 && !isInitialized) {
+                    console.log("💡 [Sync] Cloud is empty but local has data. Use 'Push to Cloud' in Settings to backup your local data.");
+                    // We keep the local data for now so it doesn't "vanish"
+                } else {
+                    setTransactions(sortedData);
+                }
+
                 if (!isInitialized) setIsInitialized(true);
             },
             (error: any) => {
                 console.error("Firestore Error (Transactions):", error);
-                if (error.code === 'failed-precondition') {
-                    console.error("The query requires an index. Check the Firebase Console.");
+                if (error.code === 'permission-denied') {
+                    alert("⚠️ Firebase Access Denied: Your security rules are blocking data. Please check the 'Security Rules' instructions I sent.");
+                } else if (error.code === 'failed-precondition') {
+                    console.error("Missing Index. Click the link in the console to create it.");
+                    alert("⚠️ Database Index Missing: The app needs a special index to show data. I've logged the creation link in the browser console (Press F12).");
+                } else if (error.message && error.message.includes('blocked-by-client')) {
+                    alert("🚫 AdBlocker Detected: Please disable your AdBlocker for this site, as it is blocking the connection to your database.");
                 }
                 setLoading(false);
             }
@@ -165,8 +233,8 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
         // Installments listener
         const qInstallments = query(
             collection(db, 'installments'),
-            where('userId', '==', user.uid),
-            orderBy('createdAt', 'desc')
+            where('userId', '==', user.uid)
+            // Removed orderBy to bypass index requirement
         );
 
         const unsubscribeInstallments = onSnapshot(qInstallments,
@@ -175,12 +243,23 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
                     id: doc.id,
                     ...doc.data()
                 })) as Installment[];
-                setInstallments(instData);
+                console.log(`📡 [Sync] Fetched ${instData.length} installments for user ${user.uid}`);
+
+                if (instData.length === 0 && installments.length > 0 && !isInitialized) {
+                    setNeedsSync(true);
+                } else {
+                    setInstallments(instData);
+                }
+
                 setLoading(false);
                 if (!isInitialized) setIsInitialized(true);
             },
             (error: any) => {
                 console.error("Firestore Error (Installments):", error);
+                if (error.code === 'permission-denied') {
+                    // One alert is enough, but logging is good
+                    console.error("Permission denied for installments");
+                }
                 setLoading(false);
             }
         );
@@ -206,7 +285,9 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
 
     const updateTransaction = async (id: string, updates: Partial<Transaction>) => {
-        await updateDoc(doc(db, 'transactions', id), updates);
+        const sanitized = { ...updates };
+        if (sanitized.amount !== undefined) sanitized.amount = Number(sanitized.amount);
+        await updateDoc(doc(db, 'transactions', id), sanitized);
     };
 
     const addInstallment = async (installment: Omit<Installment, 'id' | 'createdAt' | 'userId'>) => {
@@ -225,7 +306,10 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
 
     const updateInstallment = async (id: string, updates: Partial<Installment>) => {
-        await updateDoc(doc(db, 'installments', id), updates);
+        const sanitized = { ...updates };
+        if (sanitized.totalAmount !== undefined) sanitized.totalAmount = Number(sanitized.totalAmount);
+        if (sanitized.monthlyEmi !== undefined) sanitized.monthlyEmi = Number(sanitized.monthlyEmi);
+        await updateDoc(doc(db, 'installments', id), sanitized);
     };
 
     const totalIncome = transactions
@@ -265,32 +349,66 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
 
     const importAllData = async (data: { transactions: any[], installments: any[] }) => {
+        if (!user) {
+            alert("Please login to import data.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const promises: Promise<any>[] = [];
+
+            if (data.transactions && Array.isArray(data.transactions)) {
+                data.transactions.forEach(t => {
+                    const { id, createdAt, userId, ...tx } = t;
+                    // Improved date parsing for different formats
+                    if (tx.date && typeof tx.date === 'object' && tx.date.seconds) {
+                        tx.date = new Timestamp(tx.date.seconds, tx.date.nanoseconds);
+                    } else if (tx.date) {
+                        tx.date = new Date(tx.date);
+                    } else {
+                        tx.date = new Date();
+                    }
+                    tx.amount = Number(tx.amount) || 0;
+                    promises.push(addTransaction(tx));
+                });
+            }
+
+            if (data.installments && Array.isArray(data.installments)) {
+                data.installments.forEach(i => {
+                    const { id, createdAt, userId, ...inst } = i;
+                    inst.totalAmount = Number(inst.totalAmount) || 0;
+                    inst.monthlyEmi = Number(inst.monthlyEmi) || 0;
+                    promises.push(addInstallment(inst));
+                });
+            }
+
+            if (promises.length === 0) {
+                throw new Error("No valid data found to import.");
+            }
+
+            await Promise.all(promises);
+        } catch (error: any) {
+            console.error("Import operation failed:", error);
+            if (error.code === 'permission-denied') {
+                alert("Firebase Permission Denied: Please check your Firestore Security Rules.");
+            }
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const syncLocalToCloud = async () => {
         if (!user) return;
         setLoading(true);
         try {
-            const promises = [
-                ...(data.transactions || []).map(t => {
-                    const { id, createdAt, userId, ...tx } = t;
-                    // Ensure date is a valid date object or Timestamp
-                    if (tx.date && tx.date.seconds) {
-                        tx.date = new Timestamp(tx.date.seconds, tx.date.nanoseconds);
-                    } else {
-                        tx.date = new Date(tx.date);
-                    }
-                    tx.amount = Number(tx.amount);
-                    return addTransaction(tx);
-                }),
-                ...(data.installments || []).map(i => {
-                    const { id, createdAt, userId, ...inst } = i;
-                    inst.totalAmount = Number(inst.totalAmount);
-                    inst.monthlyEmi = Number(inst.monthlyEmi);
-                    return addInstallment(inst);
-                })
-            ];
-            await Promise.all(promises);
-        } catch (error) {
-            console.error("Error importing data:", error);
-            throw error;
+            await importAllData({ transactions, installments });
+            setNeedsSync(false);
+            alert("☁️ Cloud Sync Complete! Your data is now safely stored in the Vault.");
+        } catch (e) {
+            console.error(e);
+            alert("Failed to sync to cloud. Check your connection.");
         } finally {
             setLoading(false);
         }
@@ -339,9 +457,13 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
             }
 
             alert('Paisa has been reloaded with premium demo data! 🚀');
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('Failed to reload data. Check connection.');
+            if (error.code === 'permission-denied') {
+                alert('Firebase Forbidden: Your Firestore rules are blocking the demo data seeding. Please check your security rules.');
+            } else {
+                alert('Failed to reload data. Check connection.');
+            }
         } finally {
             setLoading(false);
         }
@@ -375,7 +497,9 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
             safeBalance,
             seedDefaultData,
             resetAllData,
-            importAllData
+            importAllData,
+            syncLocalToCloud,
+            needsSync
         }}>
             {children}
         </TransactionContext.Provider>

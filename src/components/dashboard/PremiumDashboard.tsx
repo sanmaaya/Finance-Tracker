@@ -21,8 +21,11 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid
+    CartesianGrid,
+    AreaChart,
+    Area
 } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 import { useTransactions } from '../../context/TransactionContext';
 import { useAuth } from '../../context/AuthContext';
 import './PremiumDashboard.css';
@@ -37,9 +40,13 @@ const PremiumDashboard: React.FC = () => {
         safeBalance,
         setIsFormOpen,
         setEditingTransaction,
-        currencySymbol: symbol
+        currencySymbol: symbol,
+        loading,
+        needsSync,
+        syncLocalToCloud
     } = useTransactions();
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const parseDate = (date: any): Date => {
         if (!date) return new Date();
@@ -98,15 +105,14 @@ const PremiumDashboard: React.FC = () => {
     const categoryData = useMemo(() => {
         const categoryMap = transactions
             .filter(t => t.type === 'expense')
-            .reduce((acc, t) => {
-                const amount = Number(t.amount) || 0;
-                acc[t.category] = (acc[t.category] || 0) + amount;
+            .reduce((acc: any, t) => {
+                acc[t.category] = (acc[t.category] || 0) + t.amount;
                 return acc;
-            }, {} as Record<string, number>);
+            }, {});
 
         return Object.entries(categoryMap)
             .map(([name, value]) => ({ name, value }))
-            .sort((a, b) => b.value - a.value)
+            .sort((a: any, b: any) => (b.value as number) - (a.value as number))
             .slice(0, 5);
     }, [transactions]);
 
@@ -124,6 +130,18 @@ const PremiumDashboard: React.FC = () => {
         return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
     };
 
+    if (loading && transactions.length === 0) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh] premium-dashboard">
+                <div className="text-center p-8 glass rounded-[32px] border border-primary/20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary mb-4 mx-auto"></div>
+                    <p className="text-primary font-bold tracking-widest uppercase text-xs">Accessing Vault...</p>
+                    <p className="text-muted text-sm mt-2">Drying up the blood ink...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="premium-dashboard">
             <div className="dashboard-layout">
@@ -136,10 +154,29 @@ const PremiumDashboard: React.FC = () => {
                         </h1>
                     </div>
                     <button className="add-transaction-btn" onClick={handleAddTransaction}>
-                        <Plus size={18} /> Add Transaction
+                        <Plus size={18} /> <span>Add Transaction</span>
                     </button>
 
                 </header>
+
+                {/* Cloud Sync Alert */}
+                {needsSync && (
+                    <div className="premium-card col-span-full border-primary/40 bg-primary/5 flex items-center justify-between p-4 mb-6 animate-pulse-subtle">
+                        <div className="flex items-center gap-3">
+                            <Shield className="text-primary" size={20} />
+                            <div>
+                                <p className="text-xs font-bold text-primary uppercase tracking-widest">Local Data Detected</p>
+                                <p className="text-[11px] text-muted">Your latest transactions are currently only on this device. Sync to Vault to access them everywhere.</p>
+                            </div>
+                        </div>
+                        <button
+                            className="bg-primary hover:bg-primary-hover text-bg-main px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                            onClick={syncLocalToCloud}
+                        >
+                            Sync to Vault
+                        </button>
+                    </div>
+                )}
 
                 {/* Stats Section (2x2) */}
                 <div className="stats-grid">
@@ -175,162 +212,207 @@ const PremiumDashboard: React.FC = () => {
 
 
                 {/* Goals Card (Connected to Installments) */}
-                <div className="premium-card goals-card" onClick={() => window.location.href = '/installments'} style={{ cursor: 'pointer' }}>
-                    <div className="card-header">
+                <div className="premium-card goals-card" onClick={() => navigate('/installments')} style={{ cursor: 'pointer' }}>
+                    <div className="card-header flex justify-between items-center">
                         <h3 className="card-title">Live Goals</h3>
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/5 px-2 py-1 rounded-lg">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                            Live
-                        </div>
+                        <button className="text-[10px] font-bold uppercase tracking-widest text-primary hover:opacity-70">Details</button>
                     </div>
-                    <div className="goal-list mt-4 flex flex-col gap-6">
-                        {installments.length === 0 ? (
-                            <div className="text-center py-8">
-                                <p className="text-[10px] text-muted font-bold uppercase tracking-widest mb-2">No active goals</p>
-                                <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">Setup Plan</button>
-                            </div>
-                        ) : (
-                            installments.slice(0, 3).map((inst) => {
-                                const progress = Math.round((inst.paidMonths / inst.tenure) * 100);
+                    <div className="goals-mini-list mt-8 flex flex-col gap-8">
+                        {installments.length > 0 ? installments.slice(0, 4).map(inst => {
+                            const paidPercent = Math.round((inst.paidMonths / inst.tenure) * 100);
+                            const sparkData = [
+                                { v: 10 },
+                                { v: paidPercent * 0.4 },
+                                { v: paidPercent * 0.7 },
+                                { v: paidPercent }
+                            ];
 
-                                return (
-                                    <div key={inst.id} className="goal-item-small">
-                                        <div className="flex justify-between items-end mb-2">
-                                            <div>
-                                                <p className="text-[10px] text-muted font-bold uppercase tracking-widest mb-0.5">{inst.category}</p>
-                                                <span className="text-sm font-black text-white">{inst.name}</span>
-                                            </div>
-                                            <span className="text-xs font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md">{progress}%</span>
+                            return (
+                                <div key={inst.id} className="goal-row group">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="max-w-[50%]">
+                                            <p className="text-[11px] font-black text-primary/60 uppercase tracking-widest leading-none mb-1.5">{inst.category}</p>
+                                            <h4 className="text-sm font-black text-text-primary group-hover:text-primary transition-colors truncate">{inst.name}</h4>
                                         </div>
-                                        <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
+                                        <div className="text-right">
+                                            <p className="text-lg font-black text-text-primary leading-none mb-1">{paidPercent}%</p>
+                                            <p className="text-[10px] font-bold text-muted uppercase tracking-tighter">{inst.paidMonths}/{inst.tenure} MO</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="h-10 w-full relative mt-1">
+                                        <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <AreaChart data={sparkData}>
+                                                    <defs>
+                                                        <linearGradient id={`grad-${inst.id}`} x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                                                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <Area
+                                                        type="monotone"
+                                                        dataKey="v"
+                                                        stroke="var(--primary)"
+                                                        strokeWidth={2}
+                                                        fill={`url(#grad-${inst.id})`}
+                                                        isAnimationActive={true}
+                                                    />
+                                                </AreaChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                        <div className="progress-bar-bg h-[3px] absolute bottom-0 left-0 right-0 bg-white/5 overflow-hidden">
                                             <div
-                                                className="h-full transition-all duration-1000 bg-gradient-to-r from-primary to-secondary rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"
-                                                style={{ width: `${progress}%` }}
+                                                className="progress-bar-fill h-full bg-primary shadow-[0_0_8px_var(--primary)]"
+                                                style={{ width: `${paidPercent}%` }}
                                             ></div>
                                         </div>
                                     </div>
-                                );
-                            })
+                                </div>
+                            );
+                        }) : (
+                            <div className="text-center py-8 glass rounded-2xl border border-dashed border-white/10">
+                                <p className="text-xs text-muted font-bold uppercase tracking-widest">No active installments</p>
+                            </div>
                         )}
                     </div>
                 </div>
 
-                {/* Monthly Performance Comparison */}
-                <div className="premium-card cashflow-card">
-                    <div className="card-header">
+                {/* Performance Chart */}
+                <div className="premium-card performance-card">
+                    <div className="card-header flex justify-between items-center">
                         <h3 className="card-title">Monthly Performance</h3>
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 rounded-full bg-secondary"></span>
-                                <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Income</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 rounded-full bg-primary"></span>
-                                <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Expense</span>
-                            </div>
-                        </div>
                     </div>
-                    <div className="h-full flex flex-col pt-4">
-                        <div className="chart-wrapper" style={{ height: '350px', marginTop: '1.5rem', minWidth: 0 }}>
+                    <div className="h-full flex flex-col pt-4 overflow-hidden">
+                        <div className="chart-wrapper performance-chart">
                             {hasMonthlyData ? (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                         <XAxis
                                             dataKey="name"
                                             axisLine={false}
                                             tickLine={false}
-                                            tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }}
+                                            tick={{ fill: 'var(--text-muted)', fontSize: 10, fontWeight: 600 }}
                                             dy={10}
                                         />
                                         <YAxis
                                             axisLine={false}
                                             tickLine={false}
-                                            tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }}
+                                            tick={{ fill: 'var(--text-muted)', fontSize: 10, fontWeight: 600 }}
                                         />
                                         <Tooltip
-                                            contentStyle={{
-                                                background: '#0f1014',
-                                                border: '1px solid var(--border)',
-                                                borderRadius: '16px',
-                                                boxShadow: '0 20px 40px rgba(0,0,0,0.5)'
-                                            }}
                                             cursor={{ fill: 'rgba(255,255,255,0.03)' }}
-                                            itemStyle={{ fontWeight: 800, fontSize: '12px' }}
+                                            contentStyle={{
+                                                background: 'var(--bg-card)',
+                                                border: '1px solid var(--border)',
+                                                borderRadius: '12px',
+                                                boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                                            }}
                                         />
-                                        <Bar dataKey="income" fill="#2cd1c1" radius={[6, 6, 0, 0]} barSize={12} />
-                                        <Bar dataKey="expense" fill="#7c3af2" radius={[6, 6, 0, 0]} barSize={12} />
+                                        <Bar
+                                            dataKey="income"
+                                            fill="var(--secondary)"
+                                            radius={[4, 4, 0, 0]}
+                                            barSize={20}
+                                        />
+                                        <Bar
+                                            dataKey="expense"
+                                            fill="var(--primary)"
+                                            radius={[4, 4, 0, 0]}
+                                            barSize={20}
+                                        />
                                     </BarChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <div className="flex items-center justify-center h-full text-muted text-sm font-medium">
-                                    No monthly data available. Add some transactions!
+                                <div className="flex items-center justify-center h-full text-muted text-sm">
+                                    No transaction data for the last 6 months
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* Spending Analytics Graph */}
+                {/* Spending Analytics (New Card) */}
                 <div className="premium-card market-bar">
                     <div className="card-header">
-                        <h3 className="card-title">Spending Analytics</h3>
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-muted uppercase tracking-widest">
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-1">
                             <PieIcon size={12} className="text-primary" /> Category Distribution
                         </div>
                     </div>
-                    <div className="flex gap-8 items-center h-[280px] mt-4">
-                        <div style={{ height: '100%', width: '100%', flex: 1.5, minWidth: 0 }}>
+                    <div className="flex gap-8 items-center mt-4 spending-analytics-wrapper">
+                        <div style={{ height: '100%', width: '100%', flex: 1.2, minWidth: 0 }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
                                         data={categoryData}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
+                                        innerRadius="65%"
+                                        outerRadius="90%"
+                                        paddingAngle={6}
                                         dataKey="value"
+                                        stroke="none"
                                     >
                                         {categoryData.map((_entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={COLORS[index % COLORS.length]}
+                                                style={{ filter: `drop-shadow(0 0 8px ${COLORS[index % COLORS.length]}44)` }}
+                                            />
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        contentStyle={{ background: '#0f1014', border: '1px solid var(--border)', borderRadius: '12px' }}
+                                        contentStyle={{
+                                            background: 'var(--bg-card)',
+                                            border: '1px solid var(--border)',
+                                            borderRadius: '12px',
+                                            boxShadow: 'var(--shadow-glow)'
+                                        }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="flex-1 flex flex-col gap-3 pr-4">
-                            {categoryData.slice(0, 4).map((item, index) => (
-                                <div key={index} className="flex items-center justify-between">
+
+                        <div className="flex-1 flex flex-col gap-3 pr-2">
+                            {categoryData.map((entry, index) => (
+                                <div key={entry.name} className="flex items-center justify-between group cursor-default">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted">{item.name}</span>
+                                        <div
+                                            className="w-2.5 h-2.5 rounded-full transition-transform group-hover:scale-125"
+                                            style={{
+                                                backgroundColor: COLORS[index % COLORS.length],
+                                                boxShadow: `0 0 10px ${COLORS[index % COLORS.length]}66`
+                                            }}
+                                        ></div>
+                                        <span className="text-[11px] font-bold text-text-secondary group-hover:text-primary transition-colors">
+                                            {entry.name}
+                                        </span>
                                     </div>
-                                    <span className="text-xs font-black">{symbol}{item.value.toLocaleString()}</span>
+                                    <span className="text-[11px] font-black text-primary">
+                                        {Math.round(((entry.value as number) / (categoryData.reduce((acc, b) => acc + (b.value as number), 0) || 1)) * 100)}%
+                                    </span>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </div>
 
-                {/* History Card */}
+                {/* History Section */}
                 <div className="premium-card history-card">
-                    <div className="card-header">
+                    <div className="card-header flex justify-between items-center mb-6">
                         <h3 className="card-title">Recent Activity</h3>
-                        <button className="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline" onClick={() => window.location.href = '/market'}>View Analytics</button>
+                        <button className="text-[10px] font-bold uppercase tracking-widest text-primary hover:opacity-70" onClick={() => navigate('/market')}>View All</button>
                     </div>
-                    <div className="flex flex-col gap-3">
-                        {recentTransactions.map((tx, i) => (
-                            <div key={i} className="flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all cursor-pointer" onClick={() => { setEditingTransaction(tx); setIsFormOpen(true); }}>
+                    <div className="flex flex-col gap-4">
+                        {recentTransactions.map(tx => (
+                            <div key={tx.id} className="history-item glass p-4 rounded-2xl flex items-center justify-between hover:scale-[1.02] transition-transform">
                                 <div className="flex items-center gap-4">
                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tx.type === 'income' ? 'bg-secondary/10 text-secondary' : 'bg-primary/10 text-primary'}`}>
                                         {tx.type === 'income' ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                                     </div>
-                                    <div className="min-w-0">
-                                        <p className="text-sm font-black truncate">{tx.title}</p>
+                                    <div>
+                                        <h4 className="text-xs font-bold">{tx.title}</h4>
                                         <p className="text-[10px] text-muted font-bold uppercase tracking-widest">{tx.category}</p>
                                     </div>
                                 </div>

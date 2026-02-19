@@ -116,26 +116,28 @@ const Installments: React.FC = () => {
                                     animate="visible"
                                     className="installment-item group"
                                 >
-                                    <div className="flex items-center justify-between mb-8">
-                                        <div className="flex items-center gap-6">
+                                    <div className="installment-card-header flex items-center justify-between mb-8">
+                                        <div className="installment-info-main flex items-center gap-6">
                                             <div className="icon-box-refined">
                                                 {getIcon(item.category)}
                                             </div>
                                             <div>
-                                                <div className="flex items-center gap-3 mb-1">
+                                                <div className="flex items-center gap-3 mb-1 flex-wrap">
                                                     <h3 className="text-xl font-semibold">{item.name}</h3>
-                                                    <span className={`type-tag-refined ${item.type === 'goal' ? 'savings' : 'debt'}`}>
-                                                        {item.type === 'goal' ? 'Savings Goal' : 'Monthly EMI'}
-                                                    </span>
-                                                    <span className="item-badge-clean">{item.category}</span>
+                                                    <div className="flex gap-2">
+                                                        <span className={`type-tag-refined ${item.type === 'goal' ? 'savings' : 'debt'}`}>
+                                                            {item.type === 'goal' ? 'Savings Goal' : 'Monthly EMI'}
+                                                        </span>
+                                                        <span className="item-badge-clean">{item.category}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-4 text-xs text-muted font-medium">
+                                                <div className="flex items-center gap-4 text-xs text-muted font-medium flex-wrap">
                                                     <span className="flex items-center gap-1.5"><Calendar size={14} /> Start: {item.startDate}</span>
                                                     <span className="flex items-center gap-1.5"><PieChart size={14} /> {item.paidMonths} of {item.tenure} Months</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-4">
+                                        <div className="installment-financials flex items-center gap-4">
                                             <div className="text-right">
                                                 <div className={`text-2xl font-bold ${item.type === 'goal' ? 'text-emerald-500' : ''}`}>
                                                     {symbol}{item.monthlyEmi.toLocaleString()}
@@ -145,7 +147,7 @@ const Installments: React.FC = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                            <div className="installment-actions flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                                 <button
                                                     onClick={() => handleEdit(item)}
                                                     className="p-2 text-muted hover:text-primary transition-colors"
@@ -172,9 +174,9 @@ const Installments: React.FC = () => {
                                         ></div>
                                     </div>
 
-                                    <div className="flex justify-between text-xs font-medium text-muted">
-                                        <span>Total Paid: <span className="text-white">{symbol}{(item.monthlyEmi * item.paidMonths).toLocaleString()}</span></span>
-                                        <span>Remaining: <span className="text-white">{symbol}{(item.totalAmount - (item.monthlyEmi * item.paidMonths)).toLocaleString()}</span></span>
+                                    <div className="installment-footer flex justify-between text-xs font-medium text-muted">
+                                        <span>Total Paid: <span className="text-text-primary">{symbol}{(item.monthlyEmi * item.paidMonths).toLocaleString()}</span></span>
+                                        <span>Remaining: <span className="text-text-primary">{symbol}{(item.totalAmount - (item.monthlyEmi * item.paidMonths)).toLocaleString()}</span></span>
                                     </div>
                                 </motion.div>
                             ))

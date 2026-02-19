@@ -4,11 +4,12 @@ import {
   LayoutDashboard,
   TrendingUp,
   LogOut,
-  Sun,
   Moon,
-  Zap,
   Settings,
-  User
+  User,
+  Ghost,
+  Sparkles,
+  Zap
 } from 'lucide-react';
 import './Navbar.css';
 import { useAuth } from '../../context/AuthContext';
@@ -30,7 +31,11 @@ const Navbar: React.FC = () => {
         </div>
         <div className="mobile-actions">
           <button className="theme-toggle-btn" onClick={toggleTheme}>
-            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            {theme === 'vampire' ? <Ghost size={18} /> :
+              theme === 'cyberpunk' ? <Sparkles size={18} /> :
+                theme === 'moonlight' ? <Moon size={18} /> :
+                  theme === 'dark' ? <LayoutDashboard size={18} /> :
+                    <Sparkles size={18} />}
           </button>
           <NavLink to="/settings" className="profile-avatar">
             {user?.photoURL ? <img src={user.photoURL} alt="User" /> : <User size={18} />}
@@ -72,7 +77,11 @@ const Navbar: React.FC = () => {
 
           <div className="nav-right">
             <button className="theme-toggle-btn" onClick={toggleTheme} title="Toggle Theme">
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+              {theme === 'vampire' ? <Ghost size={20} /> :
+                theme === 'cyberpunk' ? <Sparkles size={20} /> :
+                  theme === 'moonlight' ? <Moon size={20} /> :
+                    theme === 'dark' ? <LayoutDashboard size={20} /> :
+                      <Sparkles size={20} />}
             </button>
 
             <div className="nav-profile">

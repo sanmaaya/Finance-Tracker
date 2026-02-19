@@ -21,7 +21,10 @@
 
   /* Layout Constants */
   --header-h: 72px;
-  --navbar-h: 76px;
+  --navbar-h: 84px;
+  /* Increased for bottom bar comfort */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 [data-theme='dark'] {
@@ -37,6 +40,8 @@
   --text-muted: #78716c;
   --border: rgba(255, 255, 255, 0.06);
   --shadow-glow: 0 0 30px var(--primary-glow);
+  --income-rgb: 16, 185, 129;
+  --expense-rgb: 239, 68, 68;
 }
 
 [data-theme='light'] {
@@ -52,22 +57,71 @@
   --text-muted: #a8a29e;
   --border: rgba(0, 0, 0, 0.08);
   --shadow-glow: 0 0 20px var(--primary-glow);
+  --income-rgb: 16, 185, 129;
+  --expense-rgb: 239, 68, 68;
 }
 
-[data-theme='premium-dark'] {
-  --bg-main: #050507;
-  --bg-main-rgb: 5, 5, 7;
-  --bg-card: #0f1014;
-  --bg-card-hover: #15161c;
-  --primary: #7c3af2;
-  --primary-hover: #6d28d9;
-  --primary-glow: rgba(124, 58, 242, 0.25);
-  --secondary: #2cd1c1;
+/* --- Vampire / Dracula Theme (Deep Blood Red & Black) --- */
+[data-theme='vampire'] {
+  --bg-main: #0a0000;
+  --bg-main-rgb: 10, 0, 0;
+  --bg-card: rgba(22, 0, 0, 0.85);
+  --bg-card-hover: rgba(35, 0, 0, 1);
+  --primary: #ff0000;
+  --primary-hover: #cc0000;
+  --primary-glow: rgba(255, 0, 0, 0.35);
+  --secondary: #991b1b;
   --text-primary: #ffffff;
+  --text-secondary: #f87171;
+  --text-muted: #7f1d1d;
+  --border: rgba(255, 0, 0, 0.2);
+  --shadow-glow: 0 8px 32px 0 rgba(10, 0, 0, 0.9);
+  --income: #f43f5e;
+  --income-rgb: 244, 63, 94;
+  --expense: #991b1b;
+  --expense-rgb: 153, 27, 27;
+  --balance: #ef4444;
+}
+
+/* --- Midnight Cyber Theme (Neon Purple/Cyan) --- */
+[data-theme='cyberpunk'] {
+  --bg-main: #030014;
+  --bg-main-rgb: 3, 0, 20;
+  --bg-card: #0a0a25;
+  --bg-card-hover: #121235;
+  --primary: #f0abfc;
+  /* Light Purple */
+  --primary-hover: #e879f9;
+  --primary-glow: rgba(240, 171, 252, 0.4);
+  --secondary: #22d3ee;
+  /* Cyan */
+  --text-primary: #ffffff;
+  --text-secondary: #d8b4fe;
+  --text-muted: #6366f1;
+  --border: rgba(34, 211, 238, 0.2);
+  --shadow-glow: 0 0 20px rgba(240, 171, 252, 0.2);
+  --income-rgb: 34, 211, 238;
+  --expense-rgb: 240, 171, 252;
+}
+
+/* --- Moonlight Theme (Deep Navy/Silver) --- */
+[data-theme='moonlight'] {
+  --bg-main: #0f172a;
+  --bg-main-rgb: 15, 23, 42;
+  --bg-card: #1e293b;
+  --bg-card-hover: #334155;
+  --primary: #94a3b8;
+  /* Silver */
+  --primary-hover: #cbd5e1;
+  --primary-glow: rgba(148, 163, 184, 0.2);
+  --secondary: #38bdf8;
+  --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --border: rgba(255, 255, 255, 0.08);
-  --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+  --text-muted: #475569;
+  --border: rgba(255, 255, 255, 0.1);
+  --shadow-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --income-rgb: 56, 189, 248;
+  --expense-rgb: 148, 163, 184;
 }
 
 /* Base Styles */
@@ -138,10 +192,77 @@ button:active {
 
 @media (min-width: 769px) {
   .main-content {
-    padding-top: var(--header-h);
     padding-bottom: 0;
   }
 }
+
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 80px;
+    /* Space for mobile-header */
+    padding-bottom: calc(var(--navbar-h) + 1rem);
+    /* Space for bottom navbar */
+    min-height: calc(100vh - var(--navbar-h));
+  }
+}
+
+/* Common Responsive Fixes */
+.chart-container {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  h1 {
+    font-size: 1.5rem !important;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 1.25rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+
+  /* For Samsung Galaxy S8 sized screens */
+  html {
+    font-size: 14px;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+}
+
+/* Theme Utility Classes */
+.text-income {
+  color: var(--income) !important;
+}
+
+.text-expense {
+  color: var(--expense) !important;
+}
+
+.text-balance {
+  color: var(--balance) !important;
+}
+
+.bg-income {
+  background-color: var(--income) !important;
+}
+
+.bg-expense {
+  background-color: var(--expense) !important;
+}
+
 
 /* Global Grid System */
 .grid {
@@ -162,6 +283,32 @@ button:active {
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+.gap-x-8 {
+  column-gap: 2rem;
+}
+
+.gap-x-12 {
+  column-gap: 3rem;
+}
+
+.gap-y-2 {
+  row-gap: 0.5rem;
+}
+
+.gap-y-4 {
+  row-gap: 1rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.glass {
+  background: var(--bg-card) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--border) !important;
 }
 
 /* Common Classes used in JSX */
@@ -291,18 +438,29 @@ button:active {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  /* Start from top if content is too tall */
   justify-content: center;
   z-index: 2000;
-  padding: 1rem;
+  padding: 2rem 1rem;
+  /* Breathing room for scrolling */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal-content {
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
+  margin: auto;
+  /* Centering trick within flex-start parent */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
   animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

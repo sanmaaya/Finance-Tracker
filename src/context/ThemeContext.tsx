@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'dark' | 'light' | 'emerald' | 'rose' | 'ocean' | 'premium-dark';
+type Theme = 'dark' | 'light' | 'vampire' | 'cyberpunk' | 'moonlight';
 
 interface ThemeContextType {
     theme: Theme;
@@ -13,7 +13,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [theme, setTheme] = useState<Theme>(() => {
         const savedTheme = localStorage.getItem('theme') as Theme;
-        return savedTheme || 'dark';
+        return savedTheme || 'vampire';
     });
 
     useEffect(() => {
@@ -22,7 +22,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }, [theme]);
 
     const toggleTheme = () => {
-        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+        setTheme(prev => {
+            if (prev === 'vampire') return 'cyberpunk';
+            if (prev === 'cyberpunk') return 'moonlight';
+            if (prev === 'moonlight') return 'dark';
+            if (prev === 'dark') return 'light';
+            return 'vampire';
+        });
     };
 
     return (

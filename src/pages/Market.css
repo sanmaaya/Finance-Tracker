@@ -117,3 +117,13 @@
 .recharts-tooltip-wrapper {
     outline: none !important;
 }
+
+@media (max-width: 480px) {
+    .chart-wrapper {
+        height: 250px !important;
+    }
+
+    .chart-side-card {
+        padding: 1.25rem !important;
+    }
+}

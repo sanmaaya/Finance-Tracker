@@ -1,5 +1,17 @@
 .installments-page {
     padding: 1.25rem;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Prevent auto-zoom on iOS and improve mobile fit */
+@media (max-width: 768px) {
+
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
 }
 
 @media (min-width: 769px) {
@@ -36,9 +48,18 @@
 }
 
 @media (max-width: 640px) {
-    .header-top {
+    .installments-page header {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start !important;
+        gap: 1.5rem;
+        display: flex;
+    }
+
+    .installments-page header>div:last-child {
+        width: 100%;
+        justify-content: flex-end !important;
+        display: flex;
+        gap: 0.75rem;
     }
 }
 
@@ -54,10 +75,24 @@
 .new-plan-btn {
     background: var(--primary);
     color: white;
-    padding: 0.875rem 1.5rem;
+    padding: 0.8rem 1.25rem;
     border-radius: 16px;
     font-weight: 800;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+    .premium-stat-badge .text-xl {
+        font-size: 1.1rem !important;
+    }
+
+    .new-plan-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.75rem;
+    }
+}
+
+.new-plan-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -108,9 +143,57 @@
     transition: all 0.3s;
 }
 
-.installment-item:hover .icon-box-refined {
-    background: var(--primary);
-    color: white;
+@media (max-width: 850px) {
+    .installment-card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1.5rem;
+    }
+
+    .installment-financials {
+        width: 100%;
+        justify-content: space-between;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .installment-actions {
+        opacity: 1 !important;
+    }
+
+    .installment-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+.installment-info-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.icon-box-refined {
+    flex-shrink: 0;
+}
+
+.installment-financials {
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .installment-item {
+        padding: 1.25rem;
+    }
+
+    .icon-box-refined {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+    }
+
+    .installment-item h3 {
+        font-size: 1rem;
+    }
 }
 
 .item-badge-clean {
@@ -135,13 +218,13 @@
 }
 
 .type-tag-refined.debt {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    background: rgba(var(--expense-rgb, 239, 68, 68), 0.1);
+    color: var(--expense);
 }
 
 .type-tag-refined.savings {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
+    background: rgba(var(--income-rgb, 16, 185, 129), 0.1);
+    color: var(--income);
 }
 
 .bar-container-clean {
@@ -195,6 +278,12 @@
     font-weight: 800;
     color: var(--text-primary);
     letter-spacing: -0.02em;
+}
+
+@media (max-width: 640px) {
+    .stat-value-clean {
+        font-size: 1.5rem;
+    }
 }
 
 .promo-bubble-clean {

@@ -9,27 +9,29 @@
 
 ---
 
-## ✨ Premium Features
+## ✨ New: The "Midnight Premium" 2.0 Update
 
-### 📊 Advanced Analytics Hub (New)
-*   **Annual Performance Trends**: Visualize your income vs. expenses across the entire year with a high-precision bar chart.
-*   **Intelligent Category Breakdown**: Dynamic pie charts showing exactly where your money goes, supporting real-time data parsing.
-*   **Automatic Historical Trending**: Smart date parsing that recognizes historical trends even from imported backups.
+### 🌓 5 High-Octane Premium Themes
+*   **Vampire**: Deep blood reds and deep blacks.
+*   **Cyberpunk**: Neon cyan and electric purple.
+*   **Moonlight**: Silver-navy elegance.
+*   **Midnight**: Dark charcoal with high-contrast text.
+*   **Light/Cloud**: A curated, premium light mode that stays readable while maintaining the glass aesthetic.
 
-### 📥 Data Sovereignty & Portability
-*   **Robust Export/Import**: Full backup capability into a structured JSON format. Move your financial history between accounts or devices instantly.
-*   **Metadata Versioning**: Export files include timestamps and versioning to ensure data integrity during restores.
-*   **Cloud Synchronization**: Powered by Firebase Firestore for millisecond-latency data updates across all your devices.
+### 📈 Intelligent Live Goals
+*   **Sparkline Micro-Charts**: Every saving goal now features a live "pulse" graph that visualizes your pending vs. paid status in real-time.
+*   **Progress Rings**: Dual-visualization using both circular and horizontal progress bars for maximum clarity.
+*   **One-Tap Details**: Jump from your dashboard directly into your installment plans with deep-linked navigation.
 
-### 💳 Elite Debt & Goal Tracking
-*   **EMI Intelligence**: Track high-value installments (EMIs) for gadgets, loans, or insurance.
-*   **Goal-Oriented Savings**: Specialized tracking for savings goals (like a Tesla fund or dream trip) with visual progress indicators.
-*   **Safe Account Balance**: A specialized metric that calculates your "Safe to Spend" amount by deducting future obligations from current liquidity.
+### 🔒 Professional Data Sync Architecture
+*   **User-Specific Keys**: Local storage isolation per user. Your data stays separate even on shared computers.
+*   **Legacy Data Migration**: Automatic detection and migration of older data formats to the new secured architecture.
+*   **One-Tap Vault Sync**: Smart banners detect unsynced local changes and offer a "Sync to Vault" action to ensure your data is backed up to the cloud instantly.
 
-### 📱 Superior Mobile Experience
-*   **Refined Mobile Navigation**: A precision-aligned bottom navigation bar for high-reachability on modern smartphones.
-*   **Safe-Area Optimization**: Designed to avoid interference with the iPhone Dynamic Island and gesture home bars.
-*   **Fluid Responsive Layouts**: Every dashboard card, form, and chart reconfigures itself for the perfect view on any screen size.
+### 📱 Precision Mobile Optimization
+*   **Anti-Zoom Technology**: Prevents annoying browser "auto-zooms" on mobile inputs for a native-app feel.
+*   **Unbreakable Forms**: Redesigned modal system with intelligent overflow support—submit buttons are always reachable regardless of screen height.
+*   **Responsive Stack Logic**: Cards and headers intelligently reposition themselves on mobile for the best ergonomic experience.
 
 ---
 
@@ -38,9 +40,9 @@
 *   **Logic**: React 18 + TypeScript (Strict Type Safety)
 *   **Storage**: Firebase Firestore (Real-time NoSQL)
 *   **Auth**: Firebase Auth (Secure Multi-User Support)
-*   **Charts**: Recharts (Customized with High-DPI support)
-*   **Interactions**: Framer Motion (Smooth Transitions)
-*   **Design**: Custom Design System with CSS Variables (Vibrant Glassmorphism)
+*   **Charts**: Recharts (Deeply integrated with the 5-theme system)
+*   **Interactions**: Framer Motion (Smooth, buttery transitions)
+*   **Design**: Custom Design System with RGB-aware CSS Variables
 
 ---
 

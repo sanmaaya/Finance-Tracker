@@ -17,8 +17,7 @@
         "header header header header"
         "stats stats stats stats"
         "perf perf perf goals"
-        "market market market history"
-        "market market market history";
+        "market market history history";
     gap: 1.5rem;
 }
 
@@ -94,9 +93,9 @@
 }
 
 .card-title {
-    font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
 }
 
@@ -105,7 +104,7 @@
     grid-area: goals;
 }
 
-.cashflow-card {
+.performance-card {
     grid-area: perf;
 }
 
@@ -144,11 +143,45 @@
     letter-spacing: 0.05em;
 }
 
+.performance-chart {
+    height: 380px;
+    width: 100%;
+    min-width: 0;
+}
+
+.spending-analytics-wrapper {
+    height: 300px;
+}
+
+@media (max-width: 768px) {
+    .performance-chart {
+        height: 300px;
+    }
+
+    .spending-analytics-wrapper {
+        height: 450px;
+        /* More room for vertical stack */
+    }
+}
+
+@media (max-width: 480px) {
+    .performance-chart {
+        height: 250px;
+    }
+}
+
+@media (max-width: 380px) {
+    .stat-label {
+        font-size: 0.65rem;
+    }
+}
+
 .stat-value {
-    font-size: 1.25rem;
-    font-weight: 800;
+    font-size: 1.5rem;
+    font-weight: 900;
     color: var(--text-primary);
-    margin-top: 0.25rem;
+    margin-top: 0.15rem;
+    letter-spacing: -0.02em;
 }
 
 .stat-icon {
@@ -187,8 +220,9 @@
             "header header"
             "stats stats"
             "perf perf"
-            "goals history"
-            "market market";
+            "goals goals"
+            "market history"
+            "market history";
     }
 
     .stats-grid {
@@ -242,9 +276,35 @@
     .add-transaction-btn {
         padding: 0.8rem;
         border-radius: 50%;
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         justify-content: center;
+    }
+
+    .breadcrumb-trail p {
+        font-size: 10px;
+    }
+
+    .breadcrumb-trail h1 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .premium-dashboard {
+        padding: 0.75rem;
+    }
+
+    .stats-grid {
+        gap: 0.5rem;
+    }
+
+    .mini-stat-card {
+        padding: 1rem 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1rem;
     }
 }
 
@@ -284,19 +344,37 @@
 
 /* Spending Analytics Chart Responsiveness */
 @media (max-width: 480px) {
-    .premium-card.market-bar .flex.gap-8 {
+    .spending-analytics-wrapper {
         flex-direction: column;
         height: auto;
         gap: 1.5rem;
     }
 
-    .premium-card.market-bar .flex-1.h-full {
-        height: 180px;
+    .spending-analytics-wrapper>div:first-child {
+        height: 220px !important;
+        flex: none !important;
         width: 100%;
     }
 
-    .premium-card.market-bar .pr-4 {
+    .spending-analytics-wrapper .pr-2 {
         padding-right: 0;
         width: 100%;
     }
+}
+
+@keyframes pulse-subtle {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(0.998);
+    }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 3s ease-in-out infinite;
 }

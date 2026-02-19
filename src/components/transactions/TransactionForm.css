@@ -192,12 +192,29 @@
 
 @media (max-width: 480px) {
     .form-container {
-        padding: 1.75rem;
-        border-radius: 28px;
+        padding: 1.5rem;
+        border-radius: 24px;
+    }
+
+    .form-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-title {
+        font-size: 1.4rem;
+    }
+
+    .transaction-form {
+        gap: 1rem;
     }
 
     .input-row {
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1rem;
+    }
+
+    .submit-btn {
+        margin-top: 1rem;
+        padding: 0.9rem;
     }
 }

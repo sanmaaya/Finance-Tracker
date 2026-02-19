@@ -6,9 +6,7 @@ import './Dashboard.css';
 const Dashboard: React.FC = () => {
     const { setTheme } = useTheme();
 
-    useEffect(() => {
-        setTheme('premium-dark');
-    }, [setTheme]);
+    // Theme is now managed globally by useTheme
 
     return (
         <div className="dashboard-page premium-mode">

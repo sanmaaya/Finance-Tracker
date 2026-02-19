@@ -46,12 +46,11 @@ const Settings: React.FC = () => {
     const [newCategory, setNewCategory] = useState('');
 
     const themes: { id: any, name: string, color: string }[] = [
-        { id: 'dark', name: 'Obsidian', color: '#0c0a09' },
-        { id: 'light', name: 'Stone', color: '#fafaf9' },
-        { id: 'emerald', name: 'Emerald', color: '#064e3b' },
-        { id: 'rose', name: 'Rose', color: '#4c0519' },
-        { id: 'ocean', name: 'Ocean', color: '#083344' },
-        { id: 'premium-dark', name: 'Premium Dark', color: '#050507' }
+        { id: 'vampire', name: 'Vampire', color: '#ff0000' },
+        { id: 'cyberpunk', name: 'Cyberpunk', color: '#f0abfc' },
+        { id: 'moonlight', name: 'Moonlight', color: '#94a3b8' },
+        { id: 'dark', name: 'Midnight', color: '#0c0a09' },
+        { id: 'light', name: 'Cloud', color: '#fafaf9' }
     ];
 
     const handleProfileSave = async (e?: React.FormEvent | React.MouseEvent) => {
@@ -129,9 +128,13 @@ const Settings: React.FC = () => {
                     await importAllData(imported);
                     alert('Data imported successfully! 🚀');
                 }
-            } catch (err) {
+            } catch (err: any) {
                 console.error(err);
-                alert('Failed to import data. Ensure the file is a valid Paisa backup.');
+                if (err.code === 'permission-denied') {
+                    alert('Permission Denied: Your Firebase security rules are blocking this import.');
+                } else {
+                    alert('Failed to import data. Ensure the file is a valid Paisa backup and you have a stable connection.');
+                }
             }
         };
         reader.readAsText(file);
@@ -202,7 +205,11 @@ const Settings: React.FC = () => {
                         <select
                             className="currency-select"
                             value={preferences.currency}
-                            onChange={e => setPreferences({ ...preferences, currency: e.target.value })}
+                            onChange={e => {
+                                const newCurr = e.target.value;
+                                setPreferences({ ...preferences, currency: newCurr });
+                                updateCurrency(newCurr);
+                            }}
                         >
                             <option value="INR">Indian Rupee (₹)</option>
                             <option value="USD">US Dollar ($)</option>
