@@ -1,5 +1,4 @@
-import React from 'react';
-import PremiumDashboard from '../components/dashboard/PremiumDashboard';
+import DashboardLayout from '../components/dashboard/Dashboard';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -8,7 +7,7 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="dashboard-page premium-mode">
-            <PremiumDashboard />
+            <DashboardLayout />
         </div>
     );
 };

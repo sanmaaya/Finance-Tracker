@@ -28,9 +28,9 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useTransactions } from '../../context/TransactionContext';
 import { useAuth } from '../../context/AuthContext';
-import './PremiumDashboard.css';
+import './Dashboard.css';
 
-const PremiumDashboard: React.FC = () => {
+const DashboardLayout: React.FC = () => {
     const {
         transactions,
         installments,
@@ -439,4 +439,4 @@ const PremiumDashboard: React.FC = () => {
     );
 };
 
-export default PremiumDashboard;
+export default DashboardLayout;

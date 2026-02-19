@@ -2,7 +2,7 @@ import React from 'react';
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { useTransactions } from '../../context/TransactionContext';
 
-import './SummaryCards.css';
+import './Cards.css';
 
 interface SummaryProps {
     totalBalance: number;
@@ -10,7 +10,7 @@ interface SummaryProps {
     totalExpense: number;
 }
 
-const SummaryCards: React.FC<SummaryProps> = ({ totalBalance, totalIncome, totalExpense }) => {
+const Cards: React.FC<SummaryProps> = ({ totalBalance, totalIncome, totalExpense }) => {
     const { currencySymbol } = useTransactions();
 
     const formatCurrency = (amount: number) => {
@@ -82,4 +82,4 @@ const SummaryCards: React.FC<SummaryProps> = ({ totalBalance, totalIncome, total
     );
 };
 
-export default SummaryCards;
+export default Cards;
