@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Shield, Download, Upload, RefreshCw, Palette, Check, Coins, Tag, Plus, X } from 'lucide-react';
+import { User, Shield, Download, Upload, RefreshCw, Palette, Check, Coins, Tag, Plus, X as XIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useTransactions } from '../context/TransactionContext';
@@ -106,6 +106,7 @@ const Settings = () => {
                 await resetAllData();
                 alert('All data has been wiped clean. ✨');
             } catch (error) {
+                console.error(error);
                 alert('Failed to reset data. Please check your connection.');
             }
         }
@@ -265,7 +266,7 @@ const Settings = () => {
                             <div key={cat} className="category-chip glass">
                                 <span>{cat}</span>
                                 <button type="button" onClick={() => removeCategory(cat)} title="Remove">
-                                    <X size={14} />
+                                    <XIcon size={14} />
                                 </button>
                             </div>
                         ))}

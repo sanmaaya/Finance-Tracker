@@ -7,7 +7,7 @@ import './Cards.css';
 const Cards = ({ totalBalance, totalIncome, totalExpense }) => {
     const { currencySymbol } = useTransactions();
 
-    const formatCurrency = (amount: number) => {
+    const formatCurrency = (amount) => {
         return `${currencySymbol}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
