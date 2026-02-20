@@ -2,9 +2,7 @@
 
 [![Made with React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Powered by Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)](https://firebase.google.com/)
-[![Built with TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Styled with Premium CSS](https://img.shields.io/badge/Premium--UI-Luxury--Glassmorphism-gold)](https://www.w3.org/TR/CSS/)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/sanmaaya/Finance-Tracker/graphs/commit-activity)
 
 **Paise Bachaaoo** is a state-of-the-art personal finance tracker designed for absolute clarity, luxury aesthetics, and real-time market precision. Featuring a premium "Rainbow Metallic" branding system and deep-dive global market insights, it transforms the way you manage and grow your wealth.
 
