@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { useTransactions } from '../../context/TransactionContext';
+import { useTransactions } from '../../hooks/useTransactions';
+import { useTheme } from '../../hooks/useTheme';
 import { Trash2, Edit3, Search, Filter, TrendingUp, TrendingDown, Calendar } from 'lucide-react';
 import './TransactionList.css';
 
 const TransactionList = ({ onEdit }) => {
-    const { transactions, deleteTransaction, loading, currency, currencySymbol } = useTransactions();
+    const { transactions, deleteTransaction, loading, currencySymbol } = useTransactions();
+    const { theme } = useTheme();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('all');
 
@@ -12,7 +14,6 @@ const TransactionList = ({ onEdit }) => {
         const matchesSearch = t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             t.category.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesType = filterType === 'all' || t.type === filterType;
-
         return matchesSearch && matchesType;
     });
 
@@ -23,84 +24,108 @@ const TransactionList = ({ onEdit }) => {
     };
 
     if (loading) {
-        return <div className="loading-state">Loading transactions...</div>;
+        return <div style={{ color: theme.textMuted, padding: 40, textAlign: "center", fontWeight: 700 }}>Loading transactions...</div>;
     }
 
     return (
-        <div className="transaction-section">
-            <div className="section-header flex justify-between items-center mb-6">
-                <h3 className="section-title">Recent Transactions</h3>
+        <div style={{ width: "100%" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
+                <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: theme.text }}>Recent Activity</h3>
 
-                <div className="filters-container flex gap-4">
-                    <div className="search-box glass">
-                        <Search size={18} className="search-icon" />
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                    <div style={{
+                        background: theme.card, border: `1px solid ${theme.border}`, display: "flex", alignItems: "center",
+                        padding: "0 12px", borderRadius: 12, height: 42, width: 240
+                    }}>
+                        <Search size={16} color={theme.textMuted} />
                         <input
                             type="text"
-                            placeholder="Search title, category..."
+                            placeholder="Find patterns..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{
+                                background: "transparent", border: "none", color: theme.text, outline: "none",
+                                fontSize: "0.85rem", marginLeft: 8, width: "100%", fontWeight: 600
+                            }}
                         />
                     </div>
 
-                    <div className="filter-box glass">
-                        <Filter size={18} className="filter-icon" />
+                    <div style={{
+                        background: theme.card, border: `1px solid ${theme.border}`, display: "flex", alignItems: "center",
+                        padding: "0 12px", borderRadius: 12, height: 42
+                    }}>
+                        <Filter size={16} color={theme.textMuted} />
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
+                            style={{
+                                background: "transparent", border: "none", color: theme.text, outline: "none",
+                                fontSize: "0.85rem", cursor: "pointer", fontWeight: 700, marginLeft: 6
+                            }}
                         >
-                            <option value="all">All Types</option>
-                            <option value="income">Income Only</option>
-                            <option value="expense">Expense Only</option>
+                            <option value="all">All</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <div className="transaction-list">
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {filteredTransactions.length === 0 ? (
-                    <div className="empty-state glass">
-                        <p>No transactions found.</p>
+                    <div style={{
+                        background: theme.card, border: `1px solid ${theme.border}`, padding: "60px 20px", borderRadius: 24,
+                        textAlign: "center", color: theme.textMuted
+                    }}>
+                        <div style={{ width: 64, height: 64, background: `${theme.accent}10`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                            <Search size={24} color={theme.accent} />
+                        </div>
+                        <p style={{ fontWeight: 700 }}>No signals detected.</p>
+                        <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>Try adjusting your filters or search terms.</p>
                     </div>
                 ) : (
-                    filteredTransactions.map((transaction) => (
-                        <div key={transaction.id} className="transaction-item glass">
-                            <div className="item-main">
-                                <div className={`item-type-icon ${transaction.type}`}>
-                                    {transaction.type === 'income' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                    filteredTransactions.map((tx, i) => (
+                        <div key={tx.id} style={{
+                            background: theme.card, border: `1px solid ${theme.border}`, padding: "16px 20px", borderRadius: 20,
+                            display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.3s",
+                            animation: `fadeInUp 0.5s ease-out forwards ${i * 0.05}s`
+                        }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                                <div style={{
+                                    width: 44, height: 44, borderRadius: 14, background: tx.type === 'income' ? `${theme.pos}15` : `${theme.neg}15`,
+                                    display: "flex", alignItems: "center", justifyContent: "center", color: tx.type === 'income' ? theme.pos : theme.neg,
+                                    border: `1px solid ${tx.type === 'income' ? `${theme.pos}20` : `${theme.neg}20`}`
+                                }}>
+                                    {tx.type === 'income' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
                                 </div>
-                                <div className="item-details">
-                                    <h4 className="item-title">{transaction.title}</h4>
-                                    <div className="item-meta">
-                                        <span className="item-category">{transaction.category}</span>
-                                        <span className="dot">•</span>
-                                        <span className="item-date flex items-center gap-1">
-                                            <Calendar size={12} />
-                                            {formatDate(transaction.date)}
+                                <div>
+                                    <h4 style={{ fontWeight: 800, color: theme.text, fontSize: "0.95rem", marginBottom: 4 }}>{tx.title}</h4>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                        <span style={{ fontSize: "0.75rem", color: theme.accent, fontWeight: 700, background: `${theme.accent}10`, padding: "2px 8px", borderRadius: 6 }}>{tx.category}</span>
+                                        <span style={{ fontSize: "0.75rem", color: theme.textMuted, display: "flex", alignItems: "center", gap: 4, fontWeight: 600 }}>
+                                            <Calendar size={12} /> {formatDate(tx.date)}
                                         </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="item-right">
-                                <span className={`item-amount ${transaction.type === 'income' ? 'text-income' : 'text-expense'}`}>
-                                    {transaction.type === 'income' ? '+' : '-'}
-                                    {currencySymbol}{Math.abs(transaction.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </span>
-                                <div className="item-actions">
-                                    <button
-                                        className="action-btn edit"
-                                        title="Edit"
-                                        onClick={() => onEdit(transaction)}
-                                    >
-                                        <Edit3 size={16} />
-                                    </button>
-                                    <button
-                                        className="action-btn delete"
-                                        title="Delete"
-                                        onClick={() => deleteTransaction(transaction.id)}
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                            <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+                                <div style={{ textAlign: "right" }}>
+                                    <div style={{
+                                        fontSize: "1.05rem", fontWeight: 900, color: tx.type === 'income' ? theme.pos : theme.text
+                                    }}>
+                                        {tx.type === 'income' ? '+' : '-'} {currencySymbol}{Math.abs(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    </div>
+                                </div>
+                                <div style={{ display: "flex", gap: 8 }}>
+                                    <button onClick={() => onEdit(tx)} style={{
+                                        width: 34, height: 34, borderRadius: 10, background: `${theme.accent}10`, border: "none", color: theme.accent,
+                                        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
+                                    }}><Edit3 size={16} /></button>
+                                    <button onClick={() => deleteTransaction(tx.id)} style={{
+                                        width: 34, height: 34, borderRadius: 10, background: `${theme.neg}10`, border: "none", color: theme.neg,
+                                        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
+                                    }}><Trash2 size={16} /></button>
                                 </div>
                             </div>
                         </div>

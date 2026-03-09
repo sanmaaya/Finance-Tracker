@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { useAuth } from './AuthContext';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { useAuth } from '../hooks/useAuth';
 import {
     collection,
     query,
@@ -13,7 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 
-const TransactionContext = createContext(undefined);
+export const TransactionContext = createContext(undefined);
 
 export const TransactionProvider = ({ children }) => {
     // Initialize from localStorage for instant offline access
@@ -37,22 +37,22 @@ export const TransactionProvider = ({ children }) => {
     const [needsSync, setNeedsSync] = useState(false);
 
     // User-specific localStorage keys to prevent data clashing
-    const getStorageKey = (type) => {
+    const getStorageKey = useCallback((type) => {
         return user ? `paisa_${type}_${user.uid}` : `paisa_${type}_local`;
-    };
+    }, [user]);
 
     // Persist to localStorage whenever state changes, but ONLY after initial fetch
     useEffect(() => {
         if (isInitialized) {
             localStorage.setItem(getStorageKey('transactions'), JSON.stringify(transactions));
         }
-    }, [transactions, isInitialized, user]);
+    }, [transactions, isInitialized, user, getStorageKey]);
 
     useEffect(() => {
         if (isInitialized) {
             localStorage.setItem(getStorageKey('installments'), JSON.stringify(installments));
         }
-    }, [installments, isInitialized, user]);
+    }, [installments, isInitialized, user, getStorageKey]);
 
     const currencySymbol = useMemo(() => {
         switch (currency) {
@@ -210,7 +210,7 @@ export const TransactionProvider = ({ children }) => {
             unsubscribeTransactions();
             unsubscribeInstallments();
         };
-    }, [user, authLoading]);
+    }, [user, authLoading, isInitialized, transactions.length, installments.length]);
 
     const addTransaction = async (transaction) => {
         if (!user) return;
@@ -448,10 +448,4 @@ export const TransactionProvider = ({ children }) => {
     );
 };
 
-export const useTransactions = () => {
-    const context = useContext(TransactionContext);
-    if (context === undefined) {
-        throw new Error('useTransactions must be used within a TransactionProvider');
-    }
-    return context;
-};
+

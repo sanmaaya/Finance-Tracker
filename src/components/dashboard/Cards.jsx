@@ -1,6 +1,6 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { useTransactions } from '../../context/TransactionContext';
+import { useTransactions } from '../../hooks/useTransactions';
 
 import './Cards.css';
 

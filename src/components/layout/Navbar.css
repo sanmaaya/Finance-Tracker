@@ -18,66 +18,7 @@
     width: 100%;
 }
 
-.nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-shrink: 0;
-}
-
-.brand-logo-container {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background: var(--bg-card);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
-}
-
-.brand-logo {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 2px;
-    filter: drop-shadow(0 0 8px var(--primary-glow));
-}
-
-.brand-text-container {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.1;
-}
-
-.brand-name-main {
-    font-size: 1.4rem;
-    font-weight: 1000;
-    font-family: 'Inter', sans-serif;
-    color: var(--text-primary);
-    letter-spacing: -1px;
-    background: linear-gradient(180deg, #fff 0%, #aaa 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.brand-tagline {
-    font-size: 0.6rem;
-    font-weight: 800;
-    color: var(--primary);
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-top: -2px;
-    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    opacity: 0.9;
-}
+/* Brand styles moved to index.css for global availability */
 
 @keyframes luxury-shimmer {
     to {

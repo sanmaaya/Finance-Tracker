@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { User, Shield, Download, Upload, RefreshCw, Palette, Check, Coins, Tag, Plus, X as XIcon } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import { useTransactions } from '../context/TransactionContext';
+import React, { useState, useEffect } from 'react';
+import { User, Shield, Download, Upload, RefreshCw, Check, Tag, Plus, X as XIcon, Lock, Globe, Save } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../hooks/useTheme';
+import { useTransactions } from '../hooks/useTransactions';
 import './Settings.css';
 
 const Settings = () => {
     const { user, updateUsername } = useAuth();
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme, isLight } = useTheme();
     const {
         transactions,
         installments,
@@ -23,10 +23,15 @@ const Settings = () => {
         phone: localStorage.getItem('user_phone') || ''
     });
 
-    // Sync profile state when user loads
-    React.useEffect(() => {
+    useEffect(() => {
         if (user?.displayName) {
-            setProfile(prev => ({ ...prev, username: user.displayName || '' }));
+            const timer = setTimeout(() => {
+                setProfile(prev => {
+                    if (prev.username === (user.displayName || '')) return prev;
+                    return { ...prev, username: user.displayName || '' };
+                });
+            }, 0);
+            return () => clearTimeout(timer);
         }
     }, [user]);
 
@@ -46,16 +51,15 @@ const Settings = () => {
     const [newCategory, setNewCategory] = useState('');
 
     const themes = [
+        { id: 'dark', name: 'Midnight', color: '#0c0a09' },
         { id: 'vampire', name: 'Vampire', color: '#ff0000' },
         { id: 'cyberpunk', name: 'Cyberpunk', color: '#f0abfc' },
         { id: 'moonlight', name: 'Moonlight', color: '#94a3b8' },
-        { id: 'dark', name: 'Midnight', color: '#0c0a09' },
         { id: 'light', name: 'Cloud', color: '#fafaf9' }
     ];
 
     const handleProfileSave = async (e) => {
         if (e) e.preventDefault();
-
         try {
             if (profile.username && profile.username !== user?.displayName) {
                 await updateUsername(profile.username);
@@ -64,11 +68,10 @@ const Settings = () => {
             localStorage.setItem('user_phone', profile.phone);
             localStorage.setItem('pref_monthlyBudget', preferences.monthlyBudget);
             localStorage.setItem('pref_categories', JSON.stringify(categories));
-
-            alert('Profile & Preferences updated successfully! ✨');
+            alert('Settings Synchronized ✨');
         } catch (error) {
             console.error(error);
-            alert('Failed to update profile. Please try again.');
+            alert('Sync failed. Please try again.');
         }
     };
 
@@ -84,30 +87,22 @@ const Settings = () => {
     };
 
     const exportData = () => {
-        const fullData = {
-            transactions,
-            installments,
-            exportedAt: new Date().toISOString(),
-            version: '2.0'
-        };
+        const fullData = { transactions, installments, exportedAt: new Date().toISOString(), version: '2.0' };
         const dataStr = JSON.stringify(fullData, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-        const exportFileDefaultName = `paisa_backup_${new Date().toISOString().split('T')[0]}.json`;
-
         const linkElement = document.createElement('a');
         linkElement.setAttribute('href', dataUri);
-        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.setAttribute('download', `paisa_vault_backup_${new Date().toISOString().split('T')[0]}.json`);
         linkElement.click();
     };
 
     const resetData = async () => {
-        if (window.confirm('Are you sure you want to delete ALL transactions and plans? This cannot be undone.')) {
+        if (window.confirm('Erase all vault records? This is irreversible.')) {
             try {
                 await resetAllData();
-                alert('All data has been wiped clean. ✨');
+                alert('Vault Purged Successfully ✨');
             } catch (error) {
                 console.error(error);
-                alert('Failed to reset data. Please check your connection.');
             }
         }
     };
@@ -115,200 +110,206 @@ const Settings = () => {
     const handleImport = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = async (event) => {
             try {
                 const imported = JSON.parse(event.target?.result);
-
-                if (!imported.transactions && !imported.installments) {
-                    throw new Error("Invalid file format");
-                }
-
-                if (window.confirm('This will add all data from the file to your current account. Continue?')) {
+                if (window.confirm('Merge imported records into your vault?')) {
                     await importAllData(imported);
-                    alert('Data imported successfully! 🚀');
+                    alert('Data Integrated Successfully 🚀');
                 }
             } catch (err) {
                 console.error(err);
-                if (err.code === 'permission-denied') {
-                    alert('Permission Denied: Your Firebase security rules are blocking this import.');
-                } else {
-                    alert('Failed to import data. Ensure the file is a valid Paisa backup and you have a stable connection.');
-                }
+                alert('Import Failed.');
             }
         };
         reader.readAsText(file);
     };
 
+    const inputStyle = {
+        width: "100%", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 14, padding: "14px 16px",
+        color: theme.text, fontSize: "0.95rem", outline: "none", transition: "all 0.3s", fontWeight: 500
+    };
+
+    const cardStyle = {
+        background: theme.card, border: `1px solid ${theme.border}`, borderRadius: 24, padding: "32px",
+        boxShadow: isLight ? "0 10px 30px rgba(0,0,0,0.05)" : "0 10px 30px rgba(0,0,0,0.2)", height: "100%"
+    };
+
     return (
-        <div className="settings-page container">
-            <h1 className="welcome-text mb-8">Account Settings</h1>
-
-            <div className="settings-grid">
-                {/* Profile Section */}
-                <div className="settings-card glass">
-                    <h2 className="settings-section-title">
-                        <User size={20} className="text-primary" /> Personal Information
-                    </h2>
-                    <form onSubmit={handleProfileSave} className="profile-form">
-                        <div className="settings-input-group">
-                            <label>Username</label>
-                            <input
-                                type="text"
-                                value={profile.username}
-                                onChange={e => setProfile({ ...profile, username: e.target.value })}
-                                placeholder="Paisa User"
-                            />
-                        </div>
-                        <div className="settings-input-group">
-                            <label>Email Address</label>
-                            <input type="email" value={user?.email || ''} disabled />
-                        </div>
-                        <div className="settings-input-group">
-                            <label>Phone Number</label>
-                            <input
-                                type="tel"
-                                value={profile.phone}
-                                onChange={e => setProfile({ ...profile, phone: e.target.value })}
-                                placeholder="+91 XXXXX XXXXX"
-                            />
-                        </div>
-                        <button type="submit" className="save-profile-btn">Save Changes</button>
-                    </form>
-                </div>
-
-                {/* Appearance Section */}
-                <div className="settings-card glass">
-                    <h2 className="settings-section-title">
-                        <Palette size={20} className="text-primary" /> Themes
-                    </h2>
-                    <div className="theme-options-grid mb-8">
-                        {themes.map(t => (
-                            <button
-                                key={t.id}
-                                className={`theme-option-btn ${theme === t.id ? 'active' : ''}`}
-                                onClick={() => setTheme(t.id)}
-                            >
-                                <div className="theme-preview" style={{ backgroundColor: t.color }}>
-                                    {theme === t.id && <Check size={14} color="#fff" />}
-                                </div>
-                                <span className="theme-name">{t.name}</span>
-                            </button>
-                        ))}
+        <div style={{ padding: "40px 24px", minHeight: "100vh", position: "relative" }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+                <header style={{ marginBottom: 48, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 20 }}>
+                    <div>
+                        <h1 style={{ fontSize: "2.5rem", fontWeight: 900, color: theme.text, letterSpacing: "-1px" }}>Command Center</h1>
+                        <p style={{ color: theme.textMuted, fontSize: "1rem", marginTop: 8 }}>Configure your global vault parameters.</p>
                     </div>
+                </header>
 
-                    <h2 className="settings-section-title">
-                        <Coins size={20} className="text-primary" /> Localization
-                    </h2>
-                    <div className="settings-input-group">
-                        <label>Preferred Currency</label>
-                        <select
-                            className="currency-select"
-                            value={preferences.currency}
-                            onChange={e => {
-                                const newCurr = e.target.value;
-                                setPreferences({ ...preferences, currency: newCurr });
-                                updateCurrency(newCurr);
-                            }}
-                        >
-                            <option value="INR">Indian Rupee (₹)</option>
-                            <option value="USD">US Dollar ($)</option>
-                            <option value="EUR">Euro (€)</option>
-                            <option value="GBP">British Pound (£)</option>
-                            <option value="JPY">Japanese Yen (¥)</option>
-                        </select>
-                        <div className="settings-input-group mt-4">
-                            <label>Monthly Budget ({preferences.currency})</label>
-                            <input
-                                type="number"
-                                value={preferences.monthlyBudget}
-                                onChange={e => setPreferences({ ...preferences, monthlyBudget: e.target.value })}
-                                placeholder="e.g. 50000"
-                            />
-                        </div>
-                        <button
-                            type="button"
-                            className="save-profile-btn mt-6"
-                            onClick={handleProfileSave}
-                        >
-                            Update Preferences
-                        </button>
-                    </div>
-                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 32 }}>
 
-                {/* Preferences Section */}
-                <div className="settings-card glass">
-                    <h2 className="settings-section-title">
-                        <Tag size={20} className="text-primary" /> Categories Management
-                    </h2>
-                    <div className="settings-input-group mb-4">
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={newCategory}
-                                onChange={e => setNewCategory(e.target.value)}
-                                placeholder="New category name..."
-                                style={{ flex: 1 }}
-                            />
-                            <button
-                                type="button"
-                                className="save-profile-btn"
-                                style={{ marginTop: 0, padding: '0 1rem' }}
-                                onClick={addCategory}
-                            >
-                                <Plus size={18} />
-                            </button>
-                        </div>
-                    </div>
-                    <div className="category-list-chips">
-                        {categories.map(cat => (
-                            <div key={cat} className="category-chip glass">
-                                <span>{cat}</span>
-                                <button type="button" onClick={() => removeCategory(cat)} title="Remove">
-                                    <XIcon size={14} />
-                                </button>
+                    {/* PROFILE */}
+                    <div style={cardStyle}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: `${theme.accent}20`, color: theme.accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <User size={20} />
                             </div>
-                        ))}
+                            <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: theme.text }}>Identity</h2>
+                        </div>
+                        <form onSubmit={handleProfileSave} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.85rem", color: theme.textMuted, marginBottom: 10, fontWeight: 700 }}>Vault Alias</label>
+                                <input style={inputStyle} type="text" value={profile.username} onChange={e => setProfile({ ...profile, username: e.target.value })} />
+                            </div>
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.85rem", color: theme.textMuted, marginBottom: 10, fontWeight: 700 }}>Secure Channel (Email)</label>
+                                <div style={{ ...inputStyle, background: theme.surface + "80", opacity: 0.7, cursor: "not-allowed", display: "flex", alignItems: "center", gap: 10 }}>
+                                    <Lock size={14} /> {user?.email}
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.85rem", color: theme.textMuted, marginBottom: 10, fontWeight: 700 }}>Mobile Uplink</label>
+                                <input style={inputStyle} type="tel" value={profile.phone} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="+91 XXXXX XXXXX" />
+                            </div>
+                            <button type="submit" className="btn-save-lux" style={{
+                                width: "100%", padding: "14px", borderRadius: 14, border: "none", background: theme.accent, color: isLight ? "#fff" : theme.bg,
+                                fontSize: "0.95rem", fontWeight: 800, cursor: "pointer", transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "center", gap: 10
+                            }}>
+                                <Save size={18} /> Update Identity
+                            </button>
+                        </form>
                     </div>
-                    <button
-                        type="button"
-                        className="save-profile-btn mt-6 w-full"
-                        onClick={handleProfileSave}
-                    >
-                        Save Categories
-                    </button>
-                </div>
 
-                {/* Data Management Section */}
-                <div className="settings-card glass">
-                    <h2 className="settings-section-title">
-                        <Shield size={20} className="text-primary" /> Data Management
-                    </h2>
-                    <div className="data-actions">
-                        <button className="data-btn" onClick={exportData}>
-                            <Download size={18} />
-                            <span>Export Data (.json)</span>
-                        </button>
+                    {/* PREFERENCES */}
+                    <div style={cardStyle}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: `${theme.purp || '#8b5cf6'}20`, color: theme.purp || '#8b5cf6', display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <Globe size={20} />
+                            </div>
+                            <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: theme.text }}>Global Preferences</h2>
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.85rem", color: theme.textMuted, marginBottom: 12, fontWeight: 700 }}>Interface Theme</label>
+                                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                                    {themes.map(t => (
+                                        <button key={t.id} onClick={() => setTheme(t.id)} style={{
+                                            padding: "8px 16px", borderRadius: 12, border: "2px solid", cursor: "pointer", fontSize: "0.85rem", fontWeight: 700, transition: "all 0.3s",
+                                            borderColor: theme.themeId === t.id ? theme.accent : theme.border,
+                                            background: theme.themeId === t.id ? `${theme.accent}15` : theme.surface,
+                                            color: theme.themeId === t.id ? theme.accent : theme.textMuted
+                                        }}>
+                                            {t.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.85rem", color: theme.textMuted, marginBottom: 10, fontWeight: 700 }}>Vault Currency</label>
+                                <select style={{ ...inputStyle, appearance: "none" }} value={preferences.currency} onChange={e => {
+                                    const c = e.target.value; setPreferences({ ...preferences, currency: c }); updateCurrency(c);
+                                }}>
+                                    <option value="INR">Indian Rupee (₹)</option>
+                                    <option value="USD">US Dollar ($)</option>
+                                    <option value="EUR">Euro (€)</option>
+                                    <option value="GBP">British Pound (£)</option>
+                                    <option value="JPY">Japanese Yen (¥)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style={{ display: "block", fontSize: "0.85rem", color: theme.textMuted, marginBottom: 10, fontWeight: 700 }}>Monthly Budget Velocity</label>
+                                <input style={inputStyle} type="number" value={preferences.monthlyBudget} onChange={e => setPreferences({ ...preferences, monthlyBudget: e.target.value })} />
+                            </div>
+                            <button onClick={handleProfileSave} className="btn-save-lux" style={{
+                                width: "100%", padding: "14px", borderRadius: 14, border: "none", background: theme.accent, color: isLight ? "#fff" : theme.bg,
+                                fontSize: "0.95rem", fontWeight: 800, cursor: "pointer", transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "center", gap: 10
+                            }}>
+                                <Check size={18} /> Apply Preferences
+                            </button>
+                        </div>
+                    </div>
 
-                        <label className="data-btn cursor-pointer">
-                            <Upload size={18} />
-                            <span>Import Data</span>
-                            <input type="file" accept=".json" hidden onChange={handleImport} />
-                        </label>
+                    {/* CATEGORIES */}
+                    <div style={cardStyle}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: `${theme.pos}20`, color: theme.pos, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <Tag size={20} />
+                            </div>
+                            <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: theme.text }}>Focus Segments</h2>
+                        </div>
+                        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+                            <input style={{ ...inputStyle, flex: 1 }} type="text" placeholder="Add custom segment..." value={newCategory} onChange={e => setNewCategory(e.target.value)} />
+                            <button onClick={addCategory} style={{
+                                width: 50, borderRadius: 14, border: "none", background: theme.accent, color: isLight ? "#fff" : theme.bg, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
+                            }}><Plus size={20} /></button>
+                        </div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, maxHeight: 200, overflowY: "auto", padding: 2 }}>
+                            {categories.map(cat => (
+                                <div key={cat} style={{
+                                    padding: "6px 12px", borderRadius: 10, background: theme.surface, border: `1px solid ${theme.border}`, display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", fontWeight: 600, color: theme.text
+                                }}>
+                                    {cat}
+                                    <XIcon size={14} style={{ cursor: "pointer", color: theme.neg }} onClick={() => removeCategory(cat)} />
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={handleProfileSave} className="btn-save-lux" style={{
+                            width: "100%", padding: "14px", borderRadius: 14, border: "none", background: `${theme.text}10`, color: theme.text,
+                            fontSize: "0.9rem", fontWeight: 700, cursor: "pointer", marginTop: 24, transition: "all 0.3s"
+                        }}>Synchronize Segments</button>
+                    </div>
 
-                        <button className="data-btn" onClick={seedDefaultData}>
-                            <Upload size={18} />
-                            <span>Seed Default Data</span>
-                        </button>
-
-                        <button className="data-btn danger" onClick={resetData}>
-                            <RefreshCw size={18} />
-                            <span>Reset All Data</span>
-                        </button>
+                    {/* DATA MANAGEMENT */}
+                    <div style={cardStyle}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: `${theme.neg}20`, color: theme.neg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <Shield size={20} />
+                            </div>
+                            <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: theme.text }}>Vault Continuity</h2>
+                        </div>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                            <button onClick={exportData} style={{
+                                padding: "16px", borderRadius: 16, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text,
+                                cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10, transition: "all 0.3s"
+                            }} className="data-action-card">
+                                <Download size={24} />
+                                <span style={{ fontSize: "0.75rem", fontWeight: 700 }}>Archive Vault</span>
+                            </button>
+                            <label style={{
+                                padding: "16px", borderRadius: 16, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text,
+                                cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10, transition: "all 0.3s"
+                            }} className="data-action-card">
+                                <Upload size={24} />
+                                <span style={{ fontSize: "0.75rem", fontWeight: 700 }}>Extract Backup</span>
+                                <input type="file" accept=".json" hidden onChange={handleImport} />
+                            </label>
+                            <button onClick={seedDefaultData} style={{
+                                padding: "16px", borderRadius: 16, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text,
+                                cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10, transition: "all 0.3s"
+                            }} className="data-action-card">
+                                <RefreshCw size={24} />
+                                <span style={{ fontSize: "0.75rem", fontWeight: 700 }}>Seed Intel</span>
+                            </button>
+                            <button onClick={resetData} style={{
+                                padding: "16px", borderRadius: 16, border: `1px solid ${theme.neg}30`, background: `${theme.neg}10`, color: theme.neg,
+                                cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 10, transition: "all 0.3s"
+                            }} className="data-action-card danger">
+                                <XIcon size={24} />
+                                <span style={{ fontSize: "0.75rem", fontWeight: 700 }}>Purge Vault</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+            <style>{`
+                .btn-save-lux:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px ${theme.accent}40; }
+                .data-action-card:hover { border-color: ${theme.accent} !important; background: ${theme.surface}e0 !important; transform: scale(1.02); }
+                .data-action-card.danger:hover { background: ${theme.neg}20 !important; border-color: ${theme.neg} !important; }
+                input:focus, select:focus { border-color: ${theme.accent} !important; }
+                *::-webkit-scrollbar { width: 6px; }
+                *::-webkit-scrollbar-track { background: transparent; }
+                *::-webkit-scrollbar-thumb { background: ${theme.border}; borderRadius: 10px; }
+            `}</style>
         </div>
     );
 };

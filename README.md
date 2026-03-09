@@ -10,10 +10,10 @@
 
 ## ✨ New: The "Luxury Market" 3.0 Update
 
-### 💎 Animated Luxury Branding
-*   **Rainbow Metallic Shimmer**: A custom-engineered shimmer effect on the brand name that flows with gold and silver tones on hover.
-*   **Kinetic Vault Logo**: Interactive 360-degree rotating logo with proximity-based glow effects.
-*   **Premium Typography**: High-density "Inter" font weights with vertical chrome gradients.
+### 💎 Sleek Minimalist Aesthetic
+*   **Blue Accent System**: A crisp, professional blue and white gradient system replacing heavy metallic accents.
+*   **Dynamic Theme Toggle**: Instantly switch between the ultra-clean Light Mode and the premium Dark Mode from the navigation bar.
+*   **Minimalist Typography**: Clean, scalable `DM Sans` typography to keep the interface highly legible and fast.
 
 ### 📈 Professional Market Dashboard
 *   **Live Overview Row**: Real-time tracking of global benchmarks including the **DXY Index**, **EUR/USD**, and **GBP/USD**.
@@ -26,7 +26,7 @@
 *   **Cyberpunk**: Neon cyan and electric purple.
 *   **Moonlight**: Silver-navy elegance.
 *   **Midnight**: Dark charcoal with high-contrast text.
-*   **Light/Cloud**: A curated, premium light mode that stays readable while maintaining the glass aesthetic.
+*   **Cloud / Slate**: The new default clean slate and white aesthetic that maximizes productivity.
 
 ### 🔒 Professional Data Sync Architecture
 *   **User-Specific Keys**: Local storage isolation per user. Your data stays separate even on shared computers.

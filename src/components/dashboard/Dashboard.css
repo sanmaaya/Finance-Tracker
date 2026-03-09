@@ -17,7 +17,7 @@
         "header header header header"
         "stats stats stats stats"
         "perf perf perf goals"
-        "market market history history";
+        "history history breakdown breakdown";
     gap: 1.5rem;
 }
 
@@ -25,8 +25,7 @@
     grid-area: header;
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 1rem;
+    align-items: center;
 }
 
 .text-gradient {

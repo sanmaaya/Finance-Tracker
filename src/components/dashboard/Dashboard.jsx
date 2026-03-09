@@ -1,16 +1,12 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
     Plus,
-    TrendingUp,
     TrendingDown,
-    Wallet,
-    ArrowUpCircle,
-    ArrowDownCircle,
     Shield,
-    PieChart as PieIcon
+    Gem,
+    ChevronRight,
+    TrendingUp
 } from 'lucide-react';
-
-
 import {
     Tooltip,
     ResponsiveContainer,
@@ -21,23 +17,54 @@ import {
     Bar,
     XAxis,
     YAxis,
-    CartesianGrid,
-    AreaChart,
-    Area
+    CartesianGrid
 } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-import { useTransactions } from '../../context/TransactionContext';
-import { useAuth } from '../../context/AuthContext';
+import { useTransactions } from '../../hooks/useTransactions';
+import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../hooks/useTheme';
+import QuickAdd from './QuickAdd';
 import './Dashboard.css';
 
+const StatCard = ({ theme, icon, label, value, sub, color, delay, isLight, onClick }) => {
+    const [vis, setVis] = useState(false);
+    useEffect(() => { const t = setTimeout(() => setVis(true), delay); return () => clearTimeout(t); }, [delay]);
+
+    // Split value into symbol and number for better font handling
+    const symbolMatch = String(value).match(/^([^0-9,. ]+)(.*)$/);
+    const symbol = symbolMatch ? symbolMatch[1] : '';
+    const amount = symbolMatch ? symbolMatch[2] : value;
+
+    return (
+        <div className="card-hover-new" style={{
+            background: theme.card, border: `1px solid ${theme.border}`, borderRadius: 20,
+            padding: "24px 22px", position: "relative", overflow: "hidden", cursor: onClick ? 'pointer' : 'default',
+            opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(20px)",
+            transition: `all 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+            boxShadow: isLight ? "0 4px 20px rgba(0,0,0,0.06)" : "none",
+        }} onClick={onClick}>
+            <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%", background: color, opacity: 0.08, filter: "blur(20px)" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+                <div style={{ fontSize: "1.4rem" }}>{icon}</div>
+                <div style={{ fontSize: "0.7rem", color: sub?.startsWith("+") ? theme.pos : theme.neg, fontWeight: 700, background: sub?.startsWith("+") ? `${theme.pos}18` : `${theme.neg}18`, padding: "3px 9px", borderRadius: 20 }}>{sub}</div>
+            </div>
+            <div style={{ fontSize: "0.75rem", color: theme.textMuted, fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 }}>{label}</div>
+            <div style={{ fontSize: "1.7rem", fontWeight: 900, color: color, display: 'flex', alignItems: 'baseline' }}>
+                <span style={{ fontFamily: "sans-serif", fontSize: "1.3rem", marginRight: 4, opacity: 0.8 }}>{symbol}</span>
+                <span style={{ fontFamily: "'Playfair Display',serif" }}>{amount}</span>
+            </div>
+        </div>
+    );
+};
+
 const DashboardLayout = () => {
+    const { theme, isLight } = useTheme();
     const {
         transactions,
         installments,
         totalBalance,
         totalIncome,
         totalExpense,
-        safeBalance,
         setIsFormOpen,
         setEditingTransaction,
         currencySymbol: symbol,
@@ -89,10 +116,6 @@ const DashboardLayout = () => {
         return last6Months;
     }, [transactions]);
 
-    const hasMonthlyData = useMemo(() =>
-        monthlyData.some(d => d.income > 0 || d.expense > 0),
-        [monthlyData]);
-
     const recentTransactions = transactions.slice(0, 6);
 
     const categoryData = useMemo(() => {
@@ -108,8 +131,6 @@ const DashboardLayout = () => {
             .sort((a, b) => b.value - a.value)
             .slice(0, 5);
     }, [transactions]);
-
-    const COLORS = ['#7c3af2', '#2cd1c1', '#f59e0b', '#10b981', '#ef4444'];
 
     const formatTimeAgo = (date) => {
         if (!date) return 'Some time ago';
@@ -128,307 +149,226 @@ const DashboardLayout = () => {
             <div className="flex items-center justify-center min-h-[60vh] premium-dashboard">
                 <div className="text-center p-8 glass rounded-[32px] border border-primary/20">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary mb-4 mx-auto"></div>
-                    <p className="text-primary font-bold tracking-widest uppercase text-xs">Accessing Vault...</p>
-                    <p className="text-muted text-sm mt-2">Drying up the blood ink...</p>
+                    <p className="text-primary font-bold tracking-widest uppercase text-xs">Getting things ready...</p>
+                    <p className="text-muted text-sm mt-2">Putting your coins in the jar...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="premium-dashboard">
-            <div className="dashboard-layout">
-                {/* Header Area */}
-                <header className="dashboard-header">
-                    <div className="breadcrumb-trail">
-                        <p className="text-primary font-bold text-xs uppercase tracking-[0.2em] mb-1">Financial Overview</p>
-                        <h1 className="text-4xl font-extrabold tracking-tight">
-                            Hey, <span className="text-gradient">{user?.displayName?.split(' ')[0] || 'User'}</span>! 👋
-                        </h1>
+        <div className="premium-dashboard" style={{ background: theme.bg, minHeight: '100vh', transition: 'background 0.5s ease' }}>
+            <div className="dashboard-layout" style={{ maxWidth: 1300, margin: '0 auto', padding: '80px 24px 40px' }}>
+                <header className="dashboard-header" style={{ animation: "fadeInUp 0.6s ease", display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                        <button className="add-btn-lux" onClick={handleAddTransaction} style={{
+                            padding: "14px 28px", borderRadius: 50, border: "none", cursor: "pointer",
+                            background: `linear-gradient(135deg, ${theme.accent}, ${theme.orb1 || theme.accent})`,
+                            color: isLight ? "#fff" : "#080612", fontWeight: 700, fontSize: "0.9rem",
+                            fontFamily: "'DM Sans', sans-serif", boxShadow: `0 8px 24px ${theme.accent}40`,
+                            transition: "all 0.3s", display: "flex", alignItems: "center", gap: "8px"
+                        }}>
+                            <Plus size={18} /> Add Transaction
+                        </button>
                     </div>
-                    <button className="add-transaction-btn" onClick={handleAddTransaction}>
-                        <Plus size={18} /> <span>Add Transaction</span>
-                    </button>
 
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: "0.75rem", color: theme.accent, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", marginBottom: 8 }}>Overview</div>
+                        <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 3vw, 2.6rem)", fontWeight: 900, color: theme.text }}>
+                            Hi, <span style={{ fontFamily: "System-ui, sans-serif", fontWeight: 600, color: theme.accent }}>{user?.displayName?.split(' ')[0] || 'there'}</span>! 👋
+                        </h1>
+                        <p style={{ color: theme.textMuted, marginTop: 6, fontSize: "0.9rem" }}>Here&apos;s a look at your money for {new Date().toLocaleString('default', { month: 'long' })}.</p>
+                    </div>
                 </header>
 
                 {/* Cloud Sync Alert */}
                 {needsSync && (
-                    <div className="premium-card col-span-full border-primary/40 bg-primary/5 flex items-center justify-between p-4 mb-6 animate-pulse-subtle">
-                        <div className="flex items-center gap-3">
-                            <Shield className="text-primary" size={20} />
+                    <div style={{
+                        background: `${theme.accent}12`, border: `1px solid ${theme.borderH}`, borderRadius: 20,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px', marginBottom: '28px'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            <div style={{ width: 42, height: 42, borderRadius: 12, background: `${theme.accent}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Shield className="text-primary" size={20} />
+                            </div>
                             <div>
-                                <p className="text-xs font-bold text-primary uppercase tracking-widest">Local Data Detected</p>
-                                <p className="text-[11px] text-muted">Your latest transactions are currently only on this device. Sync to Vault to access them everywhere.</p>
+                                <p style={{ fontSize: '0.8rem', fontWeight: 'bold', color: theme.accent, textTransform: 'uppercase', letterSpacing: 1 }}>Save Changes</p>
+                                <p style={{ fontSize: '0.75rem', color: theme.textMuted }}>You have some recent activity to save to your cloud account.</p>
                             </div>
                         </div>
                         <button
-                            className="bg-primary hover:bg-primary-hover text-bg-main px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                            style={{
+                                background: theme.accent, color: isLight ? '#fff' : theme.bg, padding: '10px 20px',
+                                borderRadius: 12, fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase'
+                            }}
                             onClick={syncLocalToCloud}
                         >
-                            Sync to Vault
+                            Sync Now
                         </button>
                     </div>
                 )}
 
-                {/* Stats Section (2x2) */}
                 <div className="stats-grid">
-                    <div className="mini-stat-card total-balance">
-                        <div className="stat-icon text-primary"><Wallet size={20} /></div>
-                        <div>
-                            <p className="stat-label">Total balance</p>
-                            <h2 className="stat-value">{symbol}{totalBalance.toLocaleString()}</h2>
-                        </div>
-                    </div>
-                    <div className="mini-stat-card">
-                        <div className="stat-icon text-secondary"><ArrowUpCircle size={20} /></div>
-                        <div>
-                            <p className="stat-label">Income</p>
-                            <h2 className="stat-value">{symbol}{totalIncome.toLocaleString()}</h2>
-                        </div>
-                    </div>
-                    <div className="mini-stat-card">
-                        <div className="stat-icon text-rose-500"><ArrowDownCircle size={20} /></div>
-                        <div>
-                            <p className="stat-label">Expense</p>
-                            <h2 className="stat-value">{symbol}{totalExpense.toLocaleString()}</h2>
-                        </div>
-                    </div>
-                    <div className="mini-stat-card safe-account">
-                        <div className="stat-icon text-emerald-500"><Shield size={20} /></div>
-                        <div>
-                            <p className="stat-label">Safe Account</p>
-                            <h2 className="stat-value">{symbol}{safeBalance.toLocaleString()}</h2>
-                        </div>
-                    </div>
+                    <StatCard theme={theme} isLight={isLight} icon={<Gem size={22} />} label="Total Balance" value={`${symbol}${totalBalance.toLocaleString()}`} sub="+12.3%" color={theme.accent} delay={0} />
+                    <StatCard theme={theme} isLight={isLight} icon={<TrendingUp size={22} />} label="Monthly Income" value={`${symbol}${totalIncome.toLocaleString()}`} sub="+8.1%" color={theme.pos} delay={80} />
+                    <StatCard theme={theme} isLight={isLight} icon={<TrendingDown size={22} />} label="Monthly Expense" value={`${symbol}${totalExpense.toLocaleString()}`} sub="-3.2%" color={theme.neg} delay={160} />
+                    <StatCard theme={theme} isLight={isLight} icon={<Shield size={22} />} label="Net Savings" value={`${symbol}${(totalIncome - totalExpense).toLocaleString()}`} sub="+22.4%" color={theme.purp} delay={240} />
                 </div>
 
 
-                {/* Goals Card (Connected to Installments) */}
-                <div className="premium-card goals-card" onClick={() => navigate('/installments')} style={{ cursor: 'pointer' }}>
-                    <div className="card-header flex justify-between items-center">
-                        <h3 className="card-title">Live Goals</h3>
-                        <button className="text-[10px] font-bold uppercase tracking-widest text-primary hover:opacity-70">Details</button>
-                    </div>
-                    <div className="goals-mini-list mt-8 flex flex-col gap-8">
-                        {installments.length > 0 ? installments.slice(0, 4).map(inst => {
-                            const paidPercent = Math.round((inst.paidMonths / inst.tenure) * 100);
-                            const sparkData = [
-                                { v: 10 },
-                                { v: paidPercent * 0.4 },
-                                { v: paidPercent * 0.7 },
-                                { v: paidPercent }
-                            ];
-
-                            return (
-                                <div key={inst.id} className="goal-row group">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="max-w-[50%]">
-                                            <p className="text-[11px] font-black text-primary/60 uppercase tracking-widest leading-none mb-1.5">{inst.category}</p>
-                                            <h4 className="text-sm font-black text-text-primary group-hover:text-primary transition-colors truncate">{inst.name}</h4>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-lg font-black text-text-primary leading-none mb-1">{paidPercent}%</p>
-                                            <p className="text-[10px] font-bold text-muted uppercase tracking-tighter">{inst.paidMonths}/{inst.tenure} MO</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="h-10 w-full relative mt-1">
-                                        <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <AreaChart data={sparkData}>
-                                                    <defs>
-                                                        <linearGradient id={`grad-${inst.id}`} x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                                                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                                                        </linearGradient>
-                                                    </defs>
-                                                    <Area
-                                                        type="monotone"
-                                                        dataKey="v"
-                                                        stroke="var(--primary)"
-                                                        strokeWidth={2}
-                                                        fill={`url(#grad-${inst.id})`}
-                                                        isAnimationActive={true}
-                                                    />
-                                                </AreaChart>
-                                            </ResponsiveContainer>
-                                        </div>
-                                        <div className="progress-bar-bg h-[3px] absolute bottom-0 left-0 right-0 bg-white/5 overflow-hidden">
-                                            <div
-                                                className="progress-bar-fill h-full bg-primary shadow-[0_0_8px_var(--primary)]"
-                                                style={{ width: `${paidPercent}%` }}
-                                            ></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        }) : (
-                            <div className="text-center py-8 glass rounded-2xl border border-dashed border-white/10">
-                                <p className="text-xs text-muted font-bold uppercase tracking-widest">No active installments</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
+                {/* Content Grid */}
                 {/* Performance Chart */}
-                <div className="premium-card performance-card">
-                    <div className="card-header flex justify-between items-center">
-                        <h3 className="card-title">Monthly Performance</h3>
-                    </div>
-                    <div className="h-full flex flex-col pt-4 overflow-hidden">
-                        <div className="chart-wrapper performance-chart">
-                            {hasMonthlyData ? (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                                        <XAxis
-                                            dataKey="name"
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fill: 'var(--text-muted)', fontSize: 10, fontWeight: 600 }}
-                                            dy={10}
-                                        />
-                                        <YAxis
-                                            axisLine={false}
-                                            tickLine={false}
-                                            tick={{ fill: 'var(--text-muted)', fontSize: 10, fontWeight: 600 }}
-                                        />
-                                        <Tooltip
-                                            cursor={{ fill: 'rgba(255,255,255,0.03)' }}
-                                            contentStyle={{
-                                                background: 'var(--bg-card)',
-                                                border: '1px solid var(--border)',
-                                                borderRadius: '12px',
-                                                boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-                                            }}
-                                        />
-                                        <Bar
-                                            dataKey="income"
-                                            fill="var(--secondary)"
-                                            radius={[4, 4, 0, 0]}
-                                            barSize={20}
-                                        />
-                                        <Bar
-                                            dataKey="expense"
-                                            fill="var(--primary)"
-                                            radius={[4, 4, 0, 0]}
-                                            barSize={20}
-                                        />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div className="flex items-center justify-center h-full text-muted text-sm">
-                                    No transaction data for the last 6 months
-                                </div>
-                            )}
+                <div className="card-hover-new" style={{ gridArea: 'perf', background: theme.card, border: `1px solid ${theme.border}`, borderRadius: 20, padding: "24px", boxShadow: isLight ? "0 4px 20px rgba(0,0,0,0.06)" : "none" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                        <div>
+                            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: theme.text }}>Monthly Performance</div>
+                            <div style={{ fontSize: "0.75rem", color: theme.textMuted, marginTop: 3 }}>Income vs Expenses</div>
                         </div>
-                    </div>
-                </div>
-
-                {/* Spending Analytics (New Card) */}
-                <div className="premium-card market-bar">
-                    <div className="card-header">
-                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-1">
-                            <PieIcon size={12} className="text-primary" /> Spending Breakdown
-                        </div>
-                    </div>
-                    <div className="flex gap-8 items-center mt-4 spending-analytics-wrapper">
-                        <div style={{ height: '100%', width: '100%', flex: 1.2, minWidth: 0 }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={categoryData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius="65%"
-                                        outerRadius="90%"
-                                        paddingAngle={6}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {categoryData.map((_entry, index) => (
-                                            <Cell
-                                                key={`cell-${index}`}
-                                                fill={COLORS[index % COLORS.length]}
-                                                style={{ filter: `drop-shadow(0 0 8px ${COLORS[index % COLORS.length]}44)` }}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{
-                                            background: 'var(--bg-card)',
-                                            border: '1px solid var(--border)',
-                                            borderRadius: '12px',
-                                            boxShadow: 'var(--shadow-glow)'
-                                        }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-
-                        <div className="flex-1 flex flex-col gap-3 pr-2">
-                            {categoryData.map((entry, index) => (
-                                <div key={entry.name} className="flex items-center justify-between group cursor-default">
-                                    <div className="flex items-center gap-2">
-                                        <div
-                                            className="w-2.5 h-2.5 rounded-full transition-transform group-hover:scale-125"
-                                            style={{
-                                                backgroundColor: COLORS[index % COLORS.length],
-                                                boxShadow: `0 0 10px ${COLORS[index % COLORS.length]}66`
-                                            }}
-                                        ></div>
-                                        <span className="text-[11px] font-bold text-text-secondary group-hover:text-primary transition-colors">
-                                            {entry.name}
-                                        </span>
-                                    </div>
-                                    <span className="text-[11px] font-black text-primary">
-                                        {Math.round((entry.value / (categoryData.reduce((acc, b) => acc + b.value, 0) || 1)) * 100)}%
-                                    </span>
+                        <div style={{ display: "flex", gap: 12 }}>
+                            {[{ l: "Income", c: theme.pos }, { l: "Expense", c: theme.neg }].map(l => (
+                                <div key={l.l} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                                    <div style={{ width: 8, height: 8, borderRadius: 2, background: l.c }} />
+                                    <span style={{ fontSize: "0.7rem", color: theme.textMuted, fontWeight: 600 }}>{l.l}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
+                    <div style={{ height: 180 }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={monthlyData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={theme.border} vertical={false} />
+                                <XAxis
+                                    dataKey="name"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: theme.textMuted, fontSize: 10 }}
+                                />
+                                <YAxis hide />
+                                <Tooltip
+                                    cursor={{ fill: 'transparent' }}
+                                    contentStyle={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 12 }}
+                                />
+                                <Bar dataKey="income" fill={theme.pos} radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="expense" fill={theme.neg} radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
 
-                {/* History Section */}
-                <div className="premium-card history-card">
-                    <div className="card-header flex justify-between items-center mb-6">
-                        <h3 className="card-title">Recent Activity</h3>
-                        <button className="text-[10px] font-bold uppercase tracking-widest text-primary hover:opacity-70" onClick={() => navigate('/analytics')}>View All</button>
+                {/* Goals / Installments */}
+                <div className="card-hover-new" onClick={() => navigate('/installments')} style={{ gridArea: 'goals', background: theme.card, border: `1px solid ${theme.border}`, borderRadius: 20, padding: "24px", boxShadow: isLight ? "0 4px 20px rgba(0,0,0,0.06)" : "none", cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                        <div>
+                            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: theme.text }}>Live Goals</div>
+                            <div style={{ fontSize: "0.75rem", color: theme.textMuted, marginTop: 3 }}>Active installments & savings</div>
+                        </div>
+                        <ChevronRight size={18} style={{ color: theme.accent }} />
                     </div>
-                    <div className="flex flex-col gap-4">
-                        {recentTransactions.map(tx => (
-                            <div key={tx.id} className="history-item glass p-4 rounded-2xl flex items-center justify-between hover:scale-[1.02] transition-transform">
-                                <div className="flex items-center gap-4">
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tx.type === 'income' ? 'bg-secondary/10 text-secondary' : 'bg-primary/10 text-primary'}`}>
-                                        {tx.type === 'income' ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                        {installments.length > 0 ? installments.slice(0, 3).map((inst) => {
+                            const pct = Math.round((inst.paidMonths / inst.tenure) * 100);
+                            return (
+                                <div key={inst.id}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                                        <span style={{ fontSize: "0.8rem", color: theme.text, fontWeight: 600 }}>{inst.name}</span>
+                                        <span style={{ fontSize: "0.75rem", color: theme.textMuted }}>{pct}%</span>
                                     </div>
-                                    <div>
-                                        <h4 className="text-xs font-bold">{tx.title}</h4>
-                                        <p className="text-[10px] text-muted font-bold uppercase tracking-widest">{tx.category}</p>
+                                    <div style={{ height: 6, borderRadius: 3, background: `${theme.textMuted}20` }}>
+                                        <div style={{
+                                            height: "100%", borderRadius: 3, background: theme.accent, width: `${pct}%`,
+                                            transition: "width 1s ease", boxShadow: `0 0 8px ${theme.accent}60`
+                                        }} />
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <span className={`text-sm font-black ${tx.type === 'income' ? 'text-secondary' : 'text-primary'}`}>
-                                        {tx.type === 'income' ? '+' : '-'}{symbol}{tx.amount.toLocaleString()}
-                                    </span>
-                                    <p className="text-[9px] text-muted font-medium">{formatTimeAgo(tx.date)}</p>
+                            );
+                        }) : (
+                            <div style={{ textAlign: 'center', padding: '20px', color: theme.textMuted, fontSize: '0.8rem' }}>No active goals</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Bottom Row */}
+                {/* Recent Transactions */}
+                <div style={{ gridArea: 'history', background: theme.card, border: `1px solid ${theme.border}`, borderRadius: 20, padding: "24px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: theme.text }}>Recent Activities</div>
+                        <button onClick={() => navigate('/analytics')} style={{ fontSize: "0.75rem", color: theme.accent, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>View All</button>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                        {recentTransactions.map((t, i) => (
+                            <div key={t.id} style={{
+                                display: "flex", alignItems: "center", padding: "12px 0",
+                                borderBottom: i < recentTransactions.length - 1 ? `1px solid ${theme.border}` : "none"
+                            }}>
+                                <div style={{ width: 40, height: 40, borderRadius: 12, background: t.type === 'income' ? `${theme.pos}15` : `${theme.neg}15`, display: "flex", alignItems: "center", justifyContent: "center", marginRight: 14 }}>
+                                    {t.type === 'income' ? <TrendingUp size={18} color={theme.pos} /> : <TrendingDown size={18} color={theme.neg} />}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontSize: "0.85rem", fontWeight: 600, color: theme.text }}>{t.title}</div>
+                                    <div style={{ fontSize: "0.7rem", color: theme.textMuted }}>{t.category} · {formatTimeAgo(t.date)}</div>
+                                </div>
+                                <div style={{ fontWeight: 700, fontSize: "0.9rem", color: t.type === 'income' ? theme.pos : theme.neg }}>
+                                    {t.type === 'income' ? "+" : "-"}{symbol}{t.amount.toLocaleString()}
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
+                {/* Breakdown */}
+                <div style={{ gridArea: 'breakdown', background: theme.card, border: `1px solid ${theme.border}`, borderRadius: 20, padding: "24px" }}>
+                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: theme.text, marginBottom: 20 }}>Spending Breakdown</div>
+                    <div style={{ height: 200 }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={categoryData}
+                                    innerRadius={60}
+                                    outerRadius={80}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                >
+                                    {categoryData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={[theme.accent, theme.pos, theme.purp, '#F59E0B', '#EC4899'][index % 5]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px' }}>
+                        {categoryData.slice(0, 4).map((c, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: [theme.accent, theme.pos, theme.purp, '#F59E0B'][i] }} />
+                                <span style={{ fontSize: '0.7rem', color: theme.textMuted }}>{c.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             {/* Floating Action Button */}
-            <div className="fab-container">
-                <button className="fab" onClick={handleAddTransaction} title="Add Transaction">
-                    <Plus size={32} />
-                </button>
-            </div>
-        </div>
+            <button
+                onClick={handleAddTransaction}
+                className="fab-lux"
+                style={{
+                    position: "fixed", bottom: 32, right: 32, zIndex: 90,
+                    width: 60, height: 60, borderRadius: "50%", border: "none",
+                    background: `linear-gradient(135deg, ${theme.accent}, ${theme.orb1 || theme.accent})`,
+                    color: isLight ? "#fff" : "#080612", fontSize: "1.5rem",
+                    cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                    boxShadow: `0 8px 32px ${theme.accent}50`,
+                    transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
+                }}>
+                +
+            </button>
+            <style>{`
+                .card-hover-new { transition: all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1) !important; }
+                .card-hover-new:hover { transform: translateY(-5px) !important; box-shadow: 0 12px 30px rgba(0,0,0,0.12) !important; }
+                .fab-lux:hover { transform: scale(1.1) rotate(90deg); }
+                @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+            `}</style>
+        </div >
     );
 };
 

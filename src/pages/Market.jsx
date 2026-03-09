@@ -3,36 +3,57 @@ import {
     TrendingUp,
     ArrowUpRight,
     ArrowDownRight,
-    Globe,
-    Zap,
     RefreshCcw,
     Activity,
     BarChart3,
-    ArrowRightLeft
+    Globe,
+    ChevronUp,
+    ChevronDown
 } from 'lucide-react';
-import { useTransactions } from '../context/TransactionContext';
+import { useTransactions } from '../hooks/useTransactions';
+import { useTheme } from '../hooks/useTheme';
 import './Market.css';
+import CurrencyConverter from '../components/market/CurrencyConverter';
+
+const MarketCard = ({ theme, isLight, label, value, sub, subColor, icon: Icon, delay }) => {
+    const [vis, setVis] = useState(false);
+    useEffect(() => { const t = setTimeout(() => setVis(true), delay); return () => clearTimeout(t); }, [delay]);
+    return (
+        <div style={{
+            background: theme.card, border: `1px solid ${theme.border}`, borderRadius: 20, padding: "20px", display: "flex", flexDirection: "column", gap: 8,
+            opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(15px)", transition: "all 0.6s ease",
+            boxShadow: isLight ? "0 4px 20px rgba(0,0,0,0.06)" : "none"
+        }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "0.7rem", color: theme.textMuted, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>{label}</span>
+                <span style={{ fontSize: "0.7rem", color: subColor, fontWeight: 700, background: `${subColor}15`, padding: "2px 8px", borderRadius: 20 }}>{sub}</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                <span style={{ fontSize: "1.45rem", fontWeight: 800, color: theme.text }}>{value}</span>
+                {Icon && <Icon size={14} style={{ color: subColor }} />}
+            </div>
+        </div>
+    );
+};
 
 const Market = () => {
-    const { currency, currencySymbol } = useTransactions();
+    const { currency } = useTransactions();
+    const { theme, isLight } = useTheme();
     const [loading, setLoading] = useState(true);
     const [rates, setRates] = useState([]);
     const [lastUpdated, setLastUpdated] = useState(new Date());
 
-    // Mock currency data for premium feel
-    const mockData = [
-        { code: 'USD', name: 'US Dollar', rate: 1.0, change: '+0.12%', trend: 'up' },
-        { code: 'EUR', name: 'Euro', rate: 0.92, change: '-0.05%', trend: 'down' },
-        { code: 'GBP', name: 'British Pound', rate: 0.79, change: '+0.21%', trend: 'up' },
-        { code: 'JPY', name: 'Japanese Yen', rate: 149.50, change: '+0.85%', trend: 'up' },
-        { code: 'INR', name: 'Indian Rupee', rate: 82.95, change: '-0.14%', trend: 'down' },
-        { code: 'CAD', name: 'Canadian Dollar', rate: 1.35, change: '+0.08%', trend: 'up' },
-        { code: 'AUD', name: 'Australian Dollar', rate: 1.53, change: '-0.32%', trend: 'down' },
-        { code: 'AED', name: 'UAE Dirham', rate: 3.67, change: '0.00%', trend: 'stable' },
-    ];
-
     useEffect(() => {
-        // Simulate loading
+        const mockData = [
+            { code: 'USD', name: 'US Dollar', rate: 1.0, change: '+0.12%', trend: 'up' },
+            { code: 'EUR', name: 'Euro', rate: 0.92, change: '-0.05%', trend: 'down' },
+            { code: 'GBP', name: 'British Pound', rate: 0.79, change: '+0.21%', trend: 'up' },
+            { code: 'JPY', name: 'Japanese Yen', rate: 149.50, change: '+0.85%', trend: 'up' },
+            { code: 'INR', name: 'Indian Rupee', rate: 82.95, change: '-0.14%', trend: 'down' },
+            { code: 'CAD', name: 'Canadian Dollar', rate: 1.35, change: '+0.08%', trend: 'up' },
+            { code: 'AUD', name: 'Australian Dollar', rate: 1.53, change: '-0.32%', trend: 'down' },
+            { code: 'AED', name: 'UAE Dirham', rate: 3.67, change: '0.00%', trend: 'stable' },
+        ];
         const timer = setTimeout(() => {
             setRates(mockData);
             setLoading(false);
@@ -42,172 +63,101 @@ const Market = () => {
 
     const refreshMarket = () => {
         setLoading(true);
-        setTimeout(() => {
-            setLastUpdated(new Date());
-            setLoading(false);
-        }, 1000);
+        setTimeout(() => { setLastUpdated(new Date()); setLoading(false); }, 1000);
     };
 
     return (
-        <div className="market-container">
-            <header className="market-page-header">
-                <div className="header-content">
-                    <div className="badge">
-                        <Activity size={12} className="text-secondary" />
-                        <span>Real-time Market Data</span>
+        <div style={{ background: theme.bg, minHeight: "100vh", padding: "100px 24px 40px", transition: "all 0.5s ease" }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+                <header style={{ marginBottom: 40, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 20 }}>
+                    <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, background: `${theme.pos}15`, color: theme.pos, padding: "4px 12px", borderRadius: 50, width: "fit-content", marginBottom: 12 }}>
+                            <Activity size={14} />
+                            <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Live Markets</span>
+                        </div>
+                        <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "2.5rem", fontWeight: 900, color: theme.text }}>Currency <span style={{ background: `linear-gradient(90deg, ${theme.accent}, ${theme.accent2 || theme.accent})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Insights</span></h1>
+                        <p style={{ color: theme.textMuted, fontSize: "0.95rem", marginTop: 6 }}>Global exchange metrics and performance tracker.</p>
                     </div>
-                    <h1 className="text-4xl font-black tracking-tight">Currency <span className="text-gradient">Market</span></h1>
-                    <p className="text-muted">Global exchange insights and live market performance</p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="market-status glass p-2 px-4 rounded-xl flex items-center gap-2">
-                        <div className="pulse-dot"></div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">Asian Session Open</span>
-                    </div>
-                    <button className="refresh-btn glass" onClick={refreshMarket} disabled={loading}>
-                        <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
-                        <span>Sync Live</span>
+                    <button onClick={refreshMarket} disabled={loading} style={{
+                        padding: "12px 24px", borderRadius: 12, border: `1px solid ${theme.border}`, background: theme.card, color: theme.text,
+                        display: "flex", alignItems: "center", gap: 10, cursor: "pointer", transition: "all 0.3s", fontWeight: 700, fontSize: "0.85rem"
+                    }} className="btn-hover-new">
+                        <RefreshCcw size={16} className={loading ? "animate-spin" : ""} />
+                        Refresh Live
                     </button>
-                </div>
-            </header>
+                </header>
 
-            <div className="market-overview-row">
-                <div className="overview-mini-card glass">
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="text-[10px] font-black text-muted uppercase tracking-widest">DXY Index</span>
-                        <span className="text-[10px] font-black text-secondary">+0.04%</span>
-                    </div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-lg font-black">104.24</span>
-                        <TrendingUp size={12} className="text-secondary" />
-                    </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 32 }}>
+                    <MarketCard theme={theme} isLight={isLight} label="DXY Index" value="104.24" sub="+0.04%" subColor={theme.pos} icon={TrendingUp} delay={0} />
+                    <MarketCard theme={theme} isLight={isLight} label="EUR/USD" value="1.0824" sub="-0.12%" subColor={theme.neg} icon={ArrowDownRight} delay={100} />
+                    <MarketCard theme={theme} isLight={isLight} label="GBP/USD" value="1.2645" sub="+0.22%" subColor={theme.pos} icon={ArrowUpRight} delay={200} />
+                    <MarketCard theme={theme} isLight={isLight} label="USD/JPY" value="149.50" sub="+0.85%" subColor={theme.pos} icon={BarChart3} delay={300} />
                 </div>
-                <div className="overview-mini-card glass">
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="text-[10px] font-black text-muted uppercase tracking-widest">EUR/USD</span>
-                        <span className="text-[10px] font-black text-primary">-0.12%</span>
-                    </div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-lg font-black">1.0824</span>
-                        <ArrowDownRight size={12} className="text-primary" />
-                    </div>
-                </div>
-                <div className="overview-mini-card glass">
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="text-[10px] font-black text-muted uppercase tracking-widest">GBP/USD</span>
-                        <span className="text-[10px] font-black text-secondary">+0.22%</span>
-                    </div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-lg font-black">1.2645</span>
-                        <ArrowUpRight size={12} className="text-secondary" />
-                    </div>
-                </div>
-                <div className="overview-mini-card glass">
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="text-[10px] font-black text-muted uppercase tracking-widest">Volatility</span>
-                        <span className="text-[10px] font-black text-amber-500">Normal</span>
-                    </div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-lg font-black">12.4</span>
-                        <BarChart3 size={12} className="text-amber-500" />
-                    </div>
-                </div>
-            </div>
 
-            <div className="market-grid">
-                {/* Major Pair Card */}
-                <div className="premium-card highlight-card col-span-full">
-                    <div className="flex justify-between items-center mb-8">
-                        <div className="flex items-center gap-5">
-                            <div className="market-icon bg-primary/10 text-primary p-4 rounded-[20px] border border-primary/20">
-                                <Activity size={24} />
+                <div style={{
+                    background: theme.card, border: `1px solid ${theme.border}`, borderRadius: 24, padding: "32px", marginBottom: 32, position: "relative", overflow: "hidden"
+                }}>
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${theme.accent}, ${theme.purp})` }} />
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+                        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                            <div style={{ width: 48, height: 48, borderRadius: 16, background: `${theme.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${theme.border}` }}>
+                                <Globe size={24} color={theme.accent} />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">Global Strength Index</p>
-                                <h2 className="text-3xl font-black">{currency} <span className="text-muted text-xl font-bold">/ INTERNATIONAL BASKET</span></h2>
+                                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: theme.text }}>Market Overview</h3>
+                                <p style={{ fontSize: "0.8rem", color: theme.textMuted }}>Comparison versus {currency}</p>
                             </div>
                         </div>
-                        <div className="text-right flex items-center gap-4">
-                            <div className="status-pill glass px-3 py-1.5 rounded-full flex items-center gap-2 border-white/5">
-                                <div className="pulse-dot"></div>
-                                <span className="text-[10px] font-bold text-secondary tracking-widest uppercase">Strong Buy</span>
-                            </div>
-                            <div className="h-10 w-[1px] bg-border mx-2"></div>
-                            <div className="text-right">
-                                <p className="text-2xl font-black text-secondary">+2.42%</p>
-                                <p className="text-[9px] font-black text-muted uppercase tracking-widest">Growth Today</p>
-                            </div>
+                        <div style={{ textAlign: "right" }}>
+                            <div style={{ fontSize: "1.5rem", fontWeight: 900, color: theme.pos }}>+2.42%</div>
+                            <div style={{ fontSize: "0.7rem", color: theme.textMuted, textTransform: "uppercase", fontWeight: 700 }}>24h Strength</div>
                         </div>
                     </div>
-                    <div className="mt-6">
-                        <div className="h-20 w-full flex items-end gap-1.5">
-                            {[40, 70, 45, 90, 65, 80, 50, 85, 100, 75, 60, 85, 95].map((h, i) => (
-                                <div
-                                    key={i}
-                                    className="flex-1 bg-gradient-to-t from-primary/5 to-primary/40 rounded-t-md animate-growth"
-                                    style={{ height: `${h}%`, animationDelay: `${i * 0.05}s` }}
-                                ></div>
-                            ))}
-                        </div>
-                        <div className="flex justify-between mt-4">
-                            <p className="text-[10px] font-bold text-muted uppercase tracking-widest opacity-60">Base Stability Index (BSI)</p>
-                            <div className="flex gap-4">
-                                <p className="text-[10px] font-bold text-muted uppercase tracking-widest opacity-60">Avg. Volatility: 12.4%</p>
-                                <p className="text-[10px] font-bold text-muted uppercase tracking-widest opacity-60">Sentiment: <span className="text-secondary">Bullish</span></p>
-                            </div>
-                        </div>
+
+                    <div style={{ display: "flex", alignItems: "flex-end", height: 120, gap: 4 }}>
+                        {[40, 70, 45, 90, 65, 80, 50, 85, 100, 75, 60, 85, 95, 70, 80, 60, 90].map((h, i) => (
+                            <div key={i} style={{ flex: 1, background: `linear-gradient(to top, ${theme.accent}05, ${theme.accent}40)`, borderRadius: "4px 4px 0 0", height: `${h}%`, animation: `lux-growth 2s ease-out forwards ${i * 0.05}s`, opacity: 0 }} />
+                        ))}
                     </div>
                 </div>
 
-                {/* Rates List */}
-                <div className="rates-section col-span-full">
-                    <div className="section-title-bar">
-                        <h3 className="section-title">Exchange Rates</h3>
-                        <p className="last-sync">Last updated: {lastUpdated.toLocaleTimeString()}</p>
+                <CurrencyConverter theme={theme} isLight={isLight} initialRates={rates} />
+
+                <div style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: 24, overflow: "hidden" }}>
+                    <div style={{ padding: "20px 24px", borderBottom: `1px solid ${theme.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <h3 style={{ fontWeight: 800, color: theme.text }}>Exchange Rates</h3>
+                        <span style={{ fontSize: "0.7rem", color: theme.textMuted }}>Sync: {lastUpdated.toLocaleTimeString()}</span>
                     </div>
-
-                    <div className="rates-table glass">
-                        <div className="table-header">
-                            <span>Currency</span>
-                            <span className="text-center">Rate (1 {currency})</span>
-                            <span className="text-right">24h Change</span>
-                        </div>
-
-                        <div className="table-body">
-                            {loading ? (
-                                <div className="loading-state">
-                                    <div className="shimmer-row"></div>
-                                    <div className="shimmer-row"></div>
-                                    <div className="shimmer-row"></div>
-                                </div>
-                            ) : (
-                                rates.map((item, idx) => (
-                                    <div key={item.code} className="rate-row group" style={{ animationDelay: `${idx * 0.05}s` }}>
-                                        <div className="currency-info">
-                                            <div className="currency-avatar">
-                                                {item.code.substring(0, 2)}
-                                            </div>
-                                            <div>
-                                                <p className="font-black text-sm">{item.code}</p>
-                                                <p className="text-[10px] text-muted font-bold">{item.name}</p>
-                                            </div>
-                                        </div>
-                                        <div className="rate-value font-black text-sm text-center">
-                                            {item.rate.toFixed(2)}
-                                        </div>
-                                        <div className={`change-value text-right flex items-center justify-end gap-1 ${item.trend === 'up' ? 'text-secondary' : item.trend === 'down' ? 'text-primary' : 'text-muted'}`}>
-                                            {item.trend === 'up' ? <ArrowUpRight size={14} /> : item.trend === 'down' ? <ArrowDownRight size={14} /> : null}
-                                            <span className="text-xs font-black">{item.change}</span>
-                                        </div>
+                    <div style={{ padding: "0 24px" }}>
+                        {rates.map((r, i) => (
+                            <div key={r.code} style={{
+                                display: "flex", alignItems: "center", padding: "18px 0",
+                                borderBottom: i < rates.length - 1 ? `1px solid ${theme.border}` : "none"
+                            }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
+                                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${theme.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 800, color: theme.accent, border: `1px solid ${theme.border}` }}>{r.code.substring(0, 2)}</div>
+                                    <div>
+                                        <div style={{ fontSize: "0.9rem", fontWeight: 700, color: theme.text }}>{r.code}</div>
+                                        <div style={{ fontSize: "0.75rem", color: theme.textMuted }}>{r.name}</div>
                                     </div>
-                                ))
-                            )}
-                        </div>
+                                </div>
+                                <div style={{ flex: 1, textAlign: "center", fontSize: "0.95rem", fontWeight: 800, color: theme.text }}>{r.rate.toFixed(4)}</div>
+                                <div style={{ flex: 1, textAlign: "right", color: r.trend === 'up' ? theme.pos : r.trend === 'down' ? theme.neg : theme.textMuted, fontSize: "0.85rem", fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+                                    {r.trend === 'up' ? <ChevronUp size={14} /> : r.trend === 'down' ? <ChevronDown size={14} /> : null}
+                                    {r.change}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
-
-
             </div>
+            <style>{`
+                @keyframes lux-growth {
+                    from { height: 0; opacity: 0; }
+                    to { opacity: 1; }
+                }
+                .btn-hover-new:hover { background: ${theme.accent}15 !important; border-color: ${theme.accent}30 !important; color: ${theme.accent} !important; }
+            `}</style>
         </div>
     );
 };
